@@ -13,7 +13,8 @@ import Signup from './signup';
 import consultform from './consultform';     // Consultation Form component
 import pharmacy from './pharmacy';           // Pharmacy component
 import symptomChecker from './symptomchecker'; // Symptom Checker component
-
+import DoctorDashboard from './DoctorDashboard';
+import Cho from './cho';
 const Stack = createNativeStackNavigator();
 
 function HomeScreen({ navigation }) {
@@ -52,11 +53,9 @@ export default function App() {
         <Stack.Screen name="consultform" component={consultform} />
         <Stack.Screen name="pharmacy" component={pharmacy} />
         <Stack.Screen name="symptomChecker" component={symptomChecker} />
-        <Stack.Screen
-          name="EmergencyCareVideos"
-          component={EmergencyCareVideos}
-          options={{ title: "Emergency Care Videos" }}
-        />
+        <Stack.Screen name="Cho" component={Cho} />
+        <Stack.Screen name="DoctorDashboard" component={DoctorDashboard} />
+        <Stack.Screen name="EmergencyCareVideos" component={EmergencyCareVideos} options={{ title: "Emergency Care Videos" }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

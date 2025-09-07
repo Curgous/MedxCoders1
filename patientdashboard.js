@@ -112,7 +112,7 @@ export default function PatientDashboard({ navigation, route }) {
 
             <View style={styles.grid}>
                 {/* Emergency Care Button */}
-                <TouchableOpacity style={styles.gridButton} onPress={() => navigation.navigate('emergencycare')}>
+                <TouchableOpacity style={styles.gridButton} onPress={() => navigation.navigate('EmergencyCareVideos')}>
                     <Image source={require('./assets/call.png')} style={styles.buttonImage} />
                     <Text style={styles.buttonText}>{t.emergency}</Text>
                 </TouchableOpacity>
