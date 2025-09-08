@@ -1,16 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    FlatList,
-    Alert,
-    Image,
-    ScrollView
+    View, Text, TouchableOpacity, StyleSheet, FlatList, Image,
 } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
 import axios from 'axios';
+import { LanguageContext } from './LanguageContext'; // import global language context
 
 const allSymptoms = {
     en: [
@@ -64,11 +58,11 @@ const GOOGLE_GEMINI_API_ENDPOINT =
     'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBANmcnqMObOIS646XX0AxnMbKJPH2k_HU';
 
 export default function SymptomChecker() {
+    const { language, changeLanguage } = useContext(LanguageContext);
     const [selectedSymptoms, setSelectedSymptoms] = useState([]);
     const [possibleIllnesses, setPossibleIllnesses] = useState([]);
     const [loading, setLoading] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [language, setLanguage] = useState('en');
 
     const translations = {
         en: {
@@ -145,7 +139,7 @@ export default function SymptomChecker() {
 
     const handleCheckSymptoms = async () => {
         if (selectedSymptoms.length === 0) {
-            Alert.alert(t.symptomChecker, t.selectAtLeastOne);
+            alert(t.selectAtLeastOne);
             return;
         }
         setLoading(true);
@@ -179,9 +173,9 @@ export default function SymptomChecker() {
             setPossibleIllnesses(illnesses);
         } catch (error) {
             if (error.response && error.response.status === 401) {
-                Alert.alert(t.symptomChecker, t.unauthorized);
+                alert(t.unauthorized);
             } else {
-                Alert.alert(t.symptomChecker, t.fetchFailed);
+                alert(t.fetchFailed);
             }
             setPossibleIllnesses([]);
         } finally {
@@ -216,9 +210,9 @@ export default function SymptomChecker() {
                                     key={lang.code}
                                     style={styles.dropdownItem}
                                     onPress={() => {
-                                        setLanguage(lang.code);
+                                        changeLanguage(lang.code);
                                         setDropdownVisible(false);
-                                        setSelectedSymptoms([]); // Optional: clear selections on language change
+                                        setSelectedSymptoms([]); // optional clear selections on language change
                                     }}
                                 >
                                     <Text style={styles.dropdownText}>{lang.label}</Text>

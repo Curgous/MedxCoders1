@@ -1,30 +1,88 @@
-// DoctorDashboard.js
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
-export default function DoctorDashboard({ route }) {
-    const { user } = route.params || {};  // match the param name
+export default function DoctorDashboard({ navigation, route }) {
+  const { user } = route.params || {};
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Doctor Dashboard</Text>
-            {user ? (
-                <>
-                    <Text style={styles.welcome}>Welcome Dr. {user.name}!</Text>
-                    <Text style={styles.details}>Doctor ID: {user.doc_id}</Text>
-                    <Text style={styles.details}>Phone: {user.phone_no}</Text>
-                    <Text style={styles.details}>Specialization: {user.specialist}</Text>
-                </>
-            ) : (
-                <Text style={styles.details}>No doctor data found.</Text>
-            )}
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <Text style={styles.logo}>MediConnect</Text>
+
+      {/* Subtitle */}
+      <Text style={styles.dashboardTitle}>Doctor / CHO dashboard</Text>
+
+      {/* Vertical actions */}
+      <View style={styles.buttonGroup}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => { /* navigation logic */ }}>
+          <Image source={require('./assets/cal.png')} style={styles.icon} />
+          <Text style={styles.actionText}>Counselling Schedules</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={() => { /* navigation logic */ }}>
+          <Image source={require('./assets/report.png')} style={styles.icon} />
+          <Text style={styles.actionText}>Reports & Transactions</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={() => { /* navigation logic */ }}>
+          <Image source={require('./assets/verify.png')} style={[styles.icon, styles.iconLarge]} />
+          <Text style={styles.actionText}>Verify Symptoms</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#f5f5f5' },
-    title: { fontSize: 28, fontWeight: 'bold', color: '#205099', marginBottom: 20 },
-    welcome: { fontSize: 20, fontWeight: '600', marginBottom: 10, color: '#36b5b0' },
-    details: { fontSize: 16, marginBottom: 5, color: '#333' },
+  container: {
+    flex: 1,
+    backgroundColor: '#eaf7fa',
+    padding: 24,
+    alignItems: 'center',
+  },
+  logo: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#3a4d5c',
+    marginTop: 28,
+    marginBottom: 18,
+    alignSelf: 'flex-start',
+  },
+  dashboardTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#205099',
+    marginTop: 20,
+    marginBottom: 2,
+    alignSelf: 'flex-start',
+  },
+  buttonGroup: {
+    width: '100%',
+    marginTop: 38,
+    alignItems: 'center',
+  },
+  actionButton: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    width: '95%',
+    paddingVertical: 18,
+    marginBottom: 22,
+    alignItems: 'center',
+    elevation: 2,
+  },
+  icon: {
+    width: 50,
+    height: 50,
+    marginBottom: 10,
+    resizeMode: 'contain',
+  },
+  iconLarge: {
+    width: 62,
+    height: 62,
+  },
+  actionText: {
+    color: '#333333',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
 });

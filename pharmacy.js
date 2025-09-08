@@ -1,344 +1,173 @@
 import React, { useState, useEffect } from 'react';
 import {
-    View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, FlatList, Modal, Image,
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    FlatList,
+    Alert,
+    Linking,
+    ActivityIndicator,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-const STORAGE_KEY = '@demanded_medicines';
-
-const translations = {
-    en: {
-        medicineChecker: "Medicine Checker",
-        searchPlaceholder: "Search medicines...",
-        demandedMedicines: "Demanded Medicine(s)",
-        medicineRequest: "Medicine Request",
-        requestAccepted: "Medicine request accepted",
-        duplicateNotice: "is already in the demanded medicines list.",
-        removeTitle: "Remove Medicine",
-        removeConfirm: "Are you sure you want to remove",
-        removed: "has been removed from demanded medicines.",
-        cancel: "Cancel",
-        remove: "Remove",
-    },
-    pa: {
-        medicineChecker: "ਦਵਾਈ ਚੈਕਰ",
-        searchPlaceholder: "ਦਵਾਈਆਂ ਖੋਜੋ...",
-        demandedMedicines: "ਮੰਗੀਆਂ ਦਵਾਈਆਂ",
-        medicineRequest: "ਦਵਾਈ ਬੇਨਤੀ",
-        requestAccepted: "ਦਵਾਈ ਬੇਨਤੀ ਸਵੀਕਾਰ ਕੀਤੀ ਗਈ",
-        duplicateNotice: "ਪਹਿਲਾਂ ਹੀ ਮੰਗੀਆਂ ਦਵਾਈਆਂ ਦੀ ਸੂਚੀ ਵਿੱਚ ਹੈ।",
-        removeTitle: "ਦਵਾਈ ਹਟਾਓ",
-        removeConfirm: "ਕੀ ਤੁਸੀਂ ਯਕੀਨਨ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ",
-        removed: "ਮੰਗੀਆਂ ਦਵਾਈਆਂ ਵਿੱਚੋਂ ਹਟਾ ਦਿੱਤਾ ਗਿਆ ਹੈ।",
-        cancel: "ਰੱਦ ਕਰੋ",
-        remove: "ਹਟਾਓ",
-    },
-    hi: {
-        medicineChecker: "मेडिसिन चेकर",
-        searchPlaceholder: "दवाइयां खोजें...",
-        demandedMedicines: "मांगी गई दवाइयां",
-        medicineRequest: "दवा अनुरोध",
-        requestAccepted: "दवा अनुरोध स्वीकार किया गया",
-        duplicateNotice: "पहले से ही मांगी गई दवाइयों में है।",
-        removeTitle: "दवा हटाएं",
-        removeConfirm: "क्या आप वाकई हटाना चाहते हैं",
-        removed: "मांगी गई दवाइयों से हटा दिया गया है।",
-        cancel: "रद्द करें",
-        remove: "हटाएं",
-    },
-    bn: {
-        medicineChecker: "মেডিসিন চেকার",
-        searchPlaceholder: "মাদকের সন্ধান করুন...",
-        demandedMedicines: "চাহিদার ঔষধসমূহ",
-        medicineRequest: "ঔষধের অনুরোধ",
-        requestAccepted: "ঔষধের অনুরোধ গৃহীত হয়েছে",
-        duplicateNotice: "ইতিমধ্যে চাহিদার ঔষধ তালিকায় রয়েছে।",
-        removeTitle: "ঔষধ সরান",
-        removeConfirm: "আপনি কি নিশ্চিতভাবে সরাতে চান",
-        removed: "চাহিদার ঔষধসমূহ থেকে সরানো হয়েছে।",
-        cancel: "বাতিল করুন",
-        remove: "সরান",
-    },
-    ta: {
-        medicineChecker: "மருந்து தேடல்",
-        searchPlaceholder: "மருந்துகளை தேடு...",
-        demandedMedicines: "வாங்கிய மருந்துகள்",
-        medicineRequest: "மருந்து கோரிக்கை",
-        requestAccepted: "மருந்து கோரிக்கை ஏற்றுக்கொள்ளப்பட்டது",
-        duplicateNotice: "ஏற்கனவே வாங்கிய மருந்துகளில் உள்ளது.",
-        removeTitle: "மருந்தை நீக்கு",
-        removeConfirm: "நீங்கள் உண்மையிலேயே நீக்க விரும்புகிறீர்களா",
-        removed: "வாங்கிய மருந்துகளிலிருந்து நீக்கப்பட்டது.",
-        cancel: "ரத்து செய்",
-        remove: "நீக்கு",
-    },
-};
+import * as Location from 'expo-location';
+import { supabase } from './supabaseClient';
+import haversine from 'haversine-distance';
 
 export default function Pharmacy() {
     const [searchText, setSearchText] = useState('');
-    const [demandedMedicines, setDemandedMedicines] = useState([]);
-    const [language, setLanguage] = useState('en');
-    const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [userLocation, setUserLocation] = useState(null);
+    const [pharmacies, setPharmacies] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const t = translations[language];
-
+    // 🔹 Get user location on mount
     useEffect(() => {
-        async function loadMedicines() {
-            try {
-                const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
-                if (jsonValue != null) setDemandedMedicines(JSON.parse(jsonValue));
-            } catch (e) {
-                console.error('Failed to load demanded medicines', e);
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permission Denied', 'Location access is required to find nearest pharmacies.');
+                return;
             }
-        }
-        loadMedicines();
+            let location = await Location.getCurrentPositionAsync({});
+            setUserLocation({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+            });
+        })();
     }, []);
 
-    const saveMedicines = async (medicines) => {
-        try {
-            const jsonValue = JSON.stringify(medicines);
-            await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
-        } catch (e) {
-            console.error('Failed to save demanded medicines', e);
-        }
-    };
-
-    const handleBookmarkPress = () => {
-        if (searchText.trim() === '') return;
-
-        if (demandedMedicines.includes(searchText.trim())) {
-            Alert.alert(t.medicineRequest, `"${searchText}"\n\n${t.duplicateNotice}`);
+    // 🔹 Search handler
+    const handleSearch = async () => {
+        if (!searchText.trim()) return;
+        if (!userLocation) {
+            Alert.alert('Error', 'Unable to get your location.');
             return;
         }
 
-        const updatedMedicines = [...demandedMedicines, searchText.trim()];
-        setDemandedMedicines(updatedMedicines);
-        saveMedicines(updatedMedicines);
+        setLoading(true);
+        try {
+            // Fetch from Supabase
+            const { data, error } = await supabase
+                .from('pharma_status')
+                .select('*')
+                .ilike('Medicine_Name', `%${searchText.trim()}%`);
 
-        Alert.alert(t.medicineRequest, `"${searchText}"\n\n${t.requestAccepted}`);
-        setSearchText('');
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                Alert.alert('No Pharmacy', 'No pharmacy found with this medicine.');
+                setPharmacies([]);
+                setLoading(false);
+                return;
+            }
+
+            // Add distance to each pharmacy
+            const withDistance = data.map((pharma) => {
+                const distance = haversine(userLocation, {
+                    latitude: pharma.Pharmacy_Loc.latitude,
+                    longitude: pharma.Pharmacy_Loc.longitude,
+                });
+                return { ...pharma, distanceKm: (distance / 1000).toFixed(2) };
+            });
+
+            // Sort by distance, take 5 nearest
+            const sorted = withDistance.sort((a, b) => a.distanceKm - b.distanceKm).slice(0, 5);
+            setPharmacies(sorted);
+        } catch (err) {
+            Alert.alert('Error', err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleRemoveMedicine = (item) => {
-        Alert.alert(
-            t.removeTitle,
-            `${t.removeConfirm} "${item}"?`,
-            [
-                { text: t.cancel, style: 'cancel' },
-                {
-                    text: t.remove,
-                    style: 'destructive',
-                    onPress: () => {
-                        const filtered = demandedMedicines.filter(med => med !== item);
-                        setDemandedMedicines(filtered);
-                        saveMedicines(filtered);
-                        Alert.alert(t.removeTitle, `"${item}" ${t.removed}`);
-                    },
-                },
-            ],
-        );
+    // 🔹 Open Google Maps
+    const openMaps = (lat, lng) => {
+        const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+        Linking.openURL(url);
     };
 
-    const renderMedicine = ({ item }) => (
-        <View style={styles.demandedContainer}>
-            <Text style={styles.demandedText}>{item}</Text>
-            <TouchableOpacity onPress={() => handleRemoveMedicine(item)} style={styles.removeIcon}>
-                <MaterialCommunityIcons name="bookmark-remove-outline" size={28} color="#d9534f" />
+    const renderPharmacy = ({ item }) => (
+        <View style={styles.card}>
+            <Text style={styles.title}>{item.Pharma_Name}</Text>
+            <Text style={styles.text}>💊 {item.Medicine_Name}</Text>
+            <Text style={styles.text}>📦 Amount: {item.Medicine_Amount}</Text>
+            <Text style={styles.text}>📍 Distance: {item.distanceKm} km</Text>
+            <TouchableOpacity
+                style={styles.mapButton}
+                onPress={() => openMaps(item.Pharmacy_Loc.latitude, item.Pharmacy_Loc.longitude)}
+            >
+                <Text style={styles.mapButtonText}>Open in Google Maps</Text>
             </TouchableOpacity>
         </View>
     );
 
     return (
         <View style={styles.container}>
-            {/* Header with title and lang button */}
-            <View style={styles.headerRow}>
-                <Text style={styles.headerText}>{t.medicineChecker}</Text>
-                <TouchableOpacity
-                    style={styles.langButton}
-                    onPress={() => setDropdownVisible(true)}
-                    activeOpacity={0.7}
-                >
-                    <Image source={require('./assets/lang.png')} style={styles.langImage} />
+            <Text style={styles.header}>Medicine Finder</Text>
+
+            {/* Search Bar */}
+            <View style={styles.searchRow}>
+                <TextInput
+                    style={styles.searchBar}
+                    placeholder="Enter medicine name..."
+                    value={searchText}
+                    onChangeText={setSearchText}
+                />
+                <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+                    <Text style={styles.searchButtonText}>Search</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Language dropdown */}
-            <Modal
-                visible={dropdownVisible}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setDropdownVisible(false)}
-            >
-                <TouchableOpacity
-                    style={styles.modalOverlay}
-                    activeOpacity={1}
-                    onPressOut={() => setDropdownVisible(false)}
-                >
-                    <View style={styles.dropdown}>
-                        <TouchableOpacity onPress={() => { setLanguage('en'); setDropdownVisible(false); }} style={styles.dropdownItem}>
-                            <Text style={styles.dropdownText}>English</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { setLanguage('pa'); setDropdownVisible(false); }} style={styles.dropdownItem}>
-                            <Text style={styles.dropdownText}>ਪੰਜਾਬੀ</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { setLanguage('hi'); setDropdownVisible(false); }} style={styles.dropdownItem}>
-                            <Text style={styles.dropdownText}>हिन्दी</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { setLanguage('bn'); setDropdownVisible(false); }} style={styles.dropdownItem}>
-                            <Text style={styles.dropdownText}>বাংলা</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { setLanguage('ta'); setDropdownVisible(false); }} style={styles.dropdownItem}>
-                            <Text style={styles.dropdownText}>தமிழ்</Text>
-                        </TouchableOpacity>
-                    </View>
-                </TouchableOpacity>
-            </Modal>
+            {/* Loader */}
+            {loading && <ActivityIndicator size="large" color="#36b5b0" style={{ marginTop: 20 }} />}
 
-            <TextInput
-                style={styles.searchBar}
-                placeholder={t.searchPlaceholder}
-                placeholderTextColor="#999"
-                value={searchText}
-                onChangeText={setSearchText}
+            {/* Pharmacies List */}
+            <FlatList
+                data={pharmacies}
+                keyExtractor={(item, index) => item.Medicine_Id + index}
+                renderItem={renderPharmacy}
+                style={{ marginTop: 20 }}
             />
-            {searchText.trim() !== '' && (
-                <View style={styles.resultContainer}>
-                    <Text style={styles.resultText}>{searchText}</Text>
-                    <TouchableOpacity
-                        style={styles.bookmarkIcon}
-                        onPress={handleBookmarkPress}
-                    >
-                        <MaterialCommunityIcons name="bookmark-outline" size={28} color="#36b5b0" />
-                    </TouchableOpacity>
-                </View>
-            )}
-
-            {demandedMedicines.length > 0 && (
-                <>
-                    <Text style={styles.heading}>{t.demandedMedicines}</Text>
-                    <FlatList
-                        data={demandedMedicines}
-                        keyExtractor={(item, index) => item + index}
-                        renderItem={renderMedicine}
-                        style={styles.list}
-                    />
-                </>
-            )}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    container: { flex: 1, padding: 20, backgroundColor: '#eaf7fa' },
+    header: { fontSize: 24, fontWeight: 'bold', color: '#205099', marginBottom: 20, textAlign: 'center' },
+    searchRow: { flexDirection: 'row', marginBottom: 10 },
+    searchBar: {
         flex: 1,
-        padding: 24,
-        backgroundColor: '#eaf7fa',
-    },
-    headerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 18,
-        marginBottom: 20,
-        paddingHorizontal: 5,
-    },
-    headerText: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#3a4d5c',
-    },
-    langButton: {
-        backgroundColor: '#d3d3d3',
-        padding: 6,
-        borderRadius: 6,
-        width: 52,
-        height: 40,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 5,
-    },
-    langImage: {
-        width: 60,
-        height: 34,
-        resizeMode: 'contain',
-    },
-    modalOverlay: {
-        flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: 'flex-end',
-        marginTop: 60,
-        marginRight: 20,
-    },
-    dropdown: {
         backgroundColor: '#fff',
         borderRadius: 8,
-        paddingVertical: 8,
         paddingHorizontal: 12,
-        elevation: 8,
-    },
-    dropdownItem: {
-        paddingVertical: 6,
-    },
-    dropdownText: {
-        fontSize: 16,
-        color: '#205099',
-    },
-    searchBar: {
-        height: 50,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        paddingHorizontal: 16,
         fontSize: 16,
         borderColor: '#6499a1',
         borderWidth: 1,
-        color: '#333',
     },
-    resultContainer: {
-        marginTop: 20,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 16,
-        position: 'relative',
-        minHeight: 60,
-        justifyContent: 'center',
-    },
-    resultText: {
-        fontSize: 16,
-        color: '#205099',
-    },
-    bookmarkIcon: {
-        position: 'absolute',
-        bottom: 12,
-        right: 12,
-    },
-    heading: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginTop: 30,
-        marginBottom: 12,
-        color: '#3a4d5c',
-    },
-    list: {
-        maxHeight: 200,
-    },
-    demandedContainer: {
-        flexDirection: 'row',
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 14,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#6499a1',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    demandedText: {
-        fontSize: 16,
-        color: '#205099',
-        flex: 1,
-    },
-    removeIcon: {
+    searchButton: {
         marginLeft: 10,
+        backgroundColor: '#36b5b0',
+        borderRadius: 8,
+        justifyContent: 'center',
+        paddingHorizontal: 16,
     },
+    searchButtonText: { color: '#fff', fontWeight: 'bold' },
+    card: {
+        backgroundColor: '#fff',
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 12,
+        elevation: 3,
+    },
+    title: { fontSize: 18, fontWeight: 'bold', color: '#3a4d5c', marginBottom: 6 },
+    text: { fontSize: 14, color: '#205099', marginBottom: 4 },
+    mapButton: {
+        marginTop: 8,
+        backgroundColor: '#36b5b0',
+        padding: 10,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    mapButtonText: { color: '#fff', fontWeight: 'bold' },
 });

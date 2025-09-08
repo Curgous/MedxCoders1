@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
-    Image, Modal, ScrollView, Platform,
+    Image, Modal, ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { LanguageContext } from './LanguageContext'; // Import the global language context
 
 // Translations for form fields
 const formTranslations = {
@@ -116,6 +117,7 @@ const formTranslations = {
 };
 
 export default function ConsultForm({ navigation }) {
+    const { language, changeLanguage } = useContext(LanguageContext); // Use global language context
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
     const [date, setDate] = useState(null);
@@ -123,14 +125,18 @@ export default function ConsultForm({ navigation }) {
     const [gender, setGender] = useState('');
     const [hospitalType, setHospitalType] = useState('');
     const [langModal, setLangModal] = useState(false);
-    const [formLang, setFormLang] = useState('en');
     const [isDatePickerVisible, setDatePickerVisible] = useState(false);
     const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
-    const t = formTranslations[formLang];
+    const t = formTranslations[language]; // Use the language from global context
 
     const handleSubmit = () => {
         alert(`${t.submit}:\n${t.name}: ${name}\n${t.age}: ${age}\n${t.date}: ${date ? date.toLocaleDateString() : ''}\n${t.time}: ${time ? time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}\n${t.gender}: ${gender}\n${t.hosp}: ${hospitalType}`);
+    };
+
+    const selectLanguage = (lang) => {
+        changeLanguage(lang);
+        setLangModal(false);
     };
 
     return (
@@ -145,19 +151,19 @@ export default function ConsultForm({ navigation }) {
                 <Modal visible={langModal} transparent animationType="fade" onRequestClose={() => setLangModal(false)}>
                     <TouchableOpacity style={styles.langModalOverlay} activeOpacity={1} onPressOut={() => setLangModal(false)}>
                         <View style={styles.langDropdown}>
-                            <TouchableOpacity onPress={() => { setFormLang('en'); setLangModal(false); }} style={styles.langDropdownItem}>
+                            <TouchableOpacity onPress={() => selectLanguage('en')} style={styles.langDropdownItem}>
                                 <Text style={styles.langDropdownText}>English</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setFormLang('pa'); setLangModal(false); }} style={styles.langDropdownItem}>
+                            <TouchableOpacity onPress={() => selectLanguage('pa')} style={styles.langDropdownItem}>
                                 <Text style={styles.langDropdownText}>ਪੰਜਾਬੀ</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setFormLang('hi'); setLangModal(false); }} style={styles.langDropdownItem}>
+                            <TouchableOpacity onPress={() => selectLanguage('hi')} style={styles.langDropdownItem}>
                                 <Text style={styles.langDropdownText}>हिन्दी</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setFormLang('bn'); setLangModal(false); }} style={styles.langDropdownItem}>
+                            <TouchableOpacity onPress={() => selectLanguage('bn')} style={styles.langDropdownItem}>
                                 <Text style={styles.langDropdownText}>বাংলা</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setFormLang('ta'); setLangModal(false); }} style={styles.langDropdownItem}>
+                            <TouchableOpacity onPress={() => selectLanguage('ta')} style={styles.langDropdownItem}>
                                 <Text style={styles.langDropdownText}>தமிழ்</Text>
                             </TouchableOpacity>
                         </View>
