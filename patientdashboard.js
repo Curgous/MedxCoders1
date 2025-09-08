@@ -65,9 +65,27 @@ export default function PatientDashboard({ navigation, route }) {
   return (
     <View style={styles.container}>
       {/* Header */}
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.logo}>MediConnect</Text>
-        <TouchableOpacity style={styles.langButton} onPress={() => setDropdownVisible(true)}>
+
+        {/* Profile Circle on Right */}
+        <TouchableOpacity
+          style={styles.profileCircle}
+          onPress={() => navigation.navigate('Profile', { patient })}
+        >
+          <Text style={styles.profileInitial}>
+            {patient?.name ? patient.name.charAt(0).toUpperCase() : "P"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Language Button Row */}
+      <View style={styles.langContainer}>
+        <TouchableOpacity
+          style={styles.langButton}
+          onPress={() => setDropdownVisible(true)}
+        >
           <Image source={require('./assets/lang.png')} style={styles.langImage} />
         </TouchableOpacity>
       </View>
@@ -139,15 +157,27 @@ export default function PatientDashboard({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#eaf7fa', padding: 24 },
-  header: { flexDirection: 'row', alignItems: 'center', marginTop: 22 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 22,
+    justifyContent: 'space-between', // pushes logo left, profile right
+  },
   logo: { fontSize: 24, fontWeight: 'bold', color: '#3a4d5c' },
+
+  langContainer: {
+    alignItems: 'flex-end',  // puts the language button on the right
+    marginTop: 10,
+  },
+
   langButton: {
-    marginLeft: 'auto',
     backgroundColor: '#d3d3d3',
     padding: 4,
     borderRadius: 6,
   },
+
   langImage: { width: 60, height: 34, resizeMode: 'contain' },
+
   modalOverlay: { flex: 1, justifyContent: 'flex-start', alignItems: 'flex-end', marginTop: 54, marginRight: 12 },
   dropdown: {
     backgroundColor: '#fff',
@@ -177,5 +207,20 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     resizeMode: 'contain',
   },
+  profileCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#36b5b0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  profileInitial: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
   buttonText: { fontWeight: 'bold', color: '#333', textAlign: 'center' },
 });

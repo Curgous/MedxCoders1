@@ -14,6 +14,8 @@ import pharmacy from './pharmacy';
 import symptomChecker from './symptomchecker';
 import DoctorDashboard from './DoctorDashboard';
 import Cho from './cho';
+import Profile from './Profile';
+
 
 // Import LanguageProvider and LanguageContext
 import { LanguageProvider, LanguageContext } from './LanguageContext';
@@ -127,6 +129,7 @@ export default function App() {
           <Stack.Screen name="PatientDashboard" component={PatientDashboard} />
           <Stack.Screen name="consultform" component={consultform} />
           <Stack.Screen name="pharmacy" component={pharmacy} />
+          <Stack.Screen name="Profile" component={Profile} />
           <Stack.Screen name="symptomChecker" component={symptomChecker} />
           <Stack.Screen name="Cho" component={Cho} />
           <Stack.Screen name="DoctorDashboard" component={DoctorDashboard} />
