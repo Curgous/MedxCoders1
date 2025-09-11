@@ -20,7 +20,7 @@ export default function Pharmacy() {
     const [pharmacies, setPharmacies] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // 🔹 Get user location on mount
+    // Get user location on mount
     useEffect(() => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
@@ -36,7 +36,7 @@ export default function Pharmacy() {
         })();
     }, []);
 
-    // 🔹 Search handler
+    // Search handler
     const handleSearch = async () => {
         if (!searchText.trim()) return;
         if (!userLocation) {
@@ -80,12 +80,13 @@ export default function Pharmacy() {
         }
     };
 
-    // 🔹 Open Google Maps
+    // Open Google Maps
     const openMaps = (lat, lng) => {
         const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
         Linking.openURL(url);
     };
 
+    // Render pharmacy card
     const renderPharmacy = ({ item }) => (
         <View style={styles.card}>
             <Text style={styles.title}>{item.Pharma_Name}</Text>
@@ -124,7 +125,11 @@ export default function Pharmacy() {
             {/* Pharmacies List */}
             <FlatList
                 data={pharmacies}
-                keyExtractor={(item, index) => item.Medicine_Id + index}
+                keyExtractor={(item, index) =>
+                    item.Medicine_Id !== undefined && item.Medicine_Id !== null
+                        ? String(item.Medicine_Id)
+                        : `pharmacy-${index}`
+                }
                 renderItem={renderPharmacy}
                 style={{ marginTop: 20 }}
             />
@@ -134,8 +139,17 @@ export default function Pharmacy() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20, backgroundColor: '#eaf7fa' },
-    header: { fontSize: 24, fontWeight: 'bold', color: '#205099', marginBottom: 20, textAlign: 'center' },
-    searchRow: { flexDirection: 'row', marginBottom: 10 },
+    header: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#205099',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    searchRow: {
+        flexDirection: 'row',
+        marginBottom: 10,
+    },
     searchBar: {
         flex: 1,
         backgroundColor: '#fff',
@@ -152,7 +166,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 16,
     },
-    searchButtonText: { color: '#fff', fontWeight: 'bold' },
+    searchButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
     card: {
         backgroundColor: '#fff',
         padding: 16,
@@ -160,8 +177,17 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         elevation: 3,
     },
-    title: { fontSize: 18, fontWeight: 'bold', color: '#3a4d5c', marginBottom: 6 },
-    text: { fontSize: 14, color: '#205099', marginBottom: 4 },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#3a4d5c',
+        marginBottom: 6,
+    },
+    text: {
+        fontSize: 14,
+        color: '#205099',
+        marginBottom: 4,
+    },
     mapButton: {
         marginTop: 8,
         backgroundColor: '#36b5b0',
@@ -169,5 +195,8 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         alignItems: 'center',
     },
-    mapButtonText: { color: '#fff', fontWeight: 'bold' },
+    mapButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
 });

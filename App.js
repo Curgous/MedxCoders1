@@ -18,6 +18,8 @@ import Cho from './cho';
 import Profile from './Profile';
 import PharmacyLogin from './pharmacyLogin';
 import PatientReports from './patientreports';
+import PharmacistSignup from './pharmacistsignup';
+import PharmacistPortal from './pharmacistportal';
 
 // Import LanguageProvider and LanguageContext
 import { LanguageProvider, LanguageContext } from './LanguageContext';
@@ -140,6 +142,16 @@ export default function App() {
             name="EmergencyCareVideos"
             component={EmergencyCareVideos}
             options={{ title: 'Emergency Care Videos' }}
+          />
+          <Stack.Screen
+            name="PharmacistSignup"
+            component={PharmacistSignup}
+            options={{ title: 'Pharmacist Signup' }}
+          />
+          <Stack.Screen
+            name="PharmacistPortal"
+            component={PharmacistPortal}
+            options={{ title: "Pharmacist Portal" }}
           />
         </Stack.Navigator>
       </NavigationContainer>
