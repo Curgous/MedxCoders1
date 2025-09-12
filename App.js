@@ -20,6 +20,9 @@ import PharmacyLogin from './pharmacyLogin';
 import PatientReports from './patientreports';
 import PharmacistSignup from './pharmacistsignup';
 import PharmacistPortal from './pharmacistportal';
+import AddRemMedicine from './addremmedicine';
+import CheckDemand from './checkdemand';
+import ReportGen from "./reportgen";
 
 // Import LanguageProvider and LanguageContext
 import { LanguageProvider, LanguageContext } from './LanguageContext';
@@ -153,6 +156,17 @@ export default function App() {
             component={PharmacistPortal}
             options={{ title: "Pharmacist Portal" }}
           />
+          <Stack.Screen
+            name="AddRemMedicine"
+            component={AddRemMedicine}
+            options={{ title: "Add/Remove Medicine" }}
+          />
+          <Stack.Screen
+            name="CheckDemand"
+            component={CheckDemand}
+            options={{ title: "Current Medicine Demands" }} // optional
+          />
+          <Stack.Screen name="ReportGen" component={ReportGen} />
         </Stack.Navigator>
       </NavigationContainer>
     </LanguageProvider>

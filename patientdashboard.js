@@ -126,6 +126,7 @@ export default function PatientDashboard({ navigation, route }) {
           <TouchableOpacity
             style={styles.gridButton}
             onPress={() => navigation.navigate('PatientReports', { 
+            patient_no:patient?.no||'',
             patient_name: patient?.name || '',
             age: patient?.age || '',
             gender: patient?.gender || ''

@@ -36,6 +36,23 @@ export default function Pharmacy() {
         })();
     }, []);
 
+    // Add demand to med_demand table
+    const addMedicineDemand = async (medicineName) => {
+        try {
+            const { error } = await supabase
+                .from('med_demand')
+                .insert([
+                    {
+                        demand: medicineName.trim(),
+                    },
+                ]);
+            if (error) throw error;
+            Alert.alert('Demand Submitted', `Demand for "${medicineName.trim()}" has been recorded.`);
+        } catch (err) {
+            Alert.alert('Error', err.message || 'Failed to submit demand.');
+        }
+    };
+
     // Search handler
     const handleSearch = async () => {
         if (!searchText.trim()) return;
@@ -55,7 +72,20 @@ export default function Pharmacy() {
             if (error) throw error;
 
             if (!data || data.length === 0) {
-                Alert.alert('No Pharmacy', 'No pharmacy found with this medicine.');
+                Alert.alert(
+                    'Given medicine does not exist or not available',
+                    'Do you want to Demand?',
+                    [
+                        {
+                            text: 'Cancel',
+                            style: 'cancel',
+                        },
+                        {
+                            text: 'Demand',
+                            onPress: () => addMedicineDemand(searchText),
+                        },
+                    ]
+                );
                 setPharmacies([]);
                 setLoading(false);
                 return;

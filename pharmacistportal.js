@@ -7,7 +7,11 @@ import {
   Image,
 } from "react-native";
 
-export default function PharmacistPortal({ navigation }) {
+export default function PharmacistPortal({ navigation, route }) {
+  // Pass pharmacy details to AddRemMedicine via navigation
+  const { pharmacist_id, pharma_name, pharma_loc } = route.params || {};
+  console.log("Route params:", route.params);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>MediConnect</Text>
@@ -15,21 +19,27 @@ export default function PharmacistPortal({ navigation }) {
       <View style={styles.buttonList}>
         <TouchableOpacity
           style={styles.optionButton}
-          onPress={() => navigation.navigate("AddRemoveMedicines")}
+          onPress={() =>
+            navigation.navigate("AddRemMedicine", {
+              pharmacist_id,
+              pharma_name,
+              pharma_loc,
+            })
+          }
         >
           <Image
             source={require("./assets/medicine.png")}
-            style={styles.medicineIcon}     
+            style={styles.medicineIcon}
           />
           <Text style={styles.buttonText}>Add / Remove Medicines</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.optionButton}
-          onPress={() => navigation.navigate("CheckDemands")}
+          onPress={() => navigation.navigate("CheckDemand")}
         >
           <Image
             source={require("./assets/demand.png")}
-            style={styles.icon}             
+            style={styles.icon}
           />
           <Text style={styles.buttonText}>Check Demands</Text>
         </TouchableOpacity>
@@ -50,7 +60,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     color: "#3a4d5c",
-    marginTop:10,
+    marginTop: 10,
     marginBottom: 10,
     alignSelf: "flex-start",
   },
@@ -58,7 +68,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#205099",
     fontWeight: "bold",
-    marginTop:15,
+    marginTop: 15,
     marginBottom: 25,
     alignSelf: "flex-start",
   },
@@ -80,13 +90,13 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   medicineIcon: {
-    width: 70,  // Enlarged size specifically for medicine.png
+    width: 70,
     height: 70,
     marginBottom: 8,
     resizeMode: "contain",
   },
   icon: {
-    width: 60,  // Default size for other icons
+    width: 60,
     height: 60,
     marginBottom: 8,
     resizeMode: "contain",

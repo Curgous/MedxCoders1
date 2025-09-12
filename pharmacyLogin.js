@@ -33,7 +33,11 @@ export default function PharmacistLogin({ navigation }) {
 
       if (data.password === password) {
         Alert.alert("Login Successful", `Welcome ${data.p_name}!`);
-        navigation.navigate('PharmacistPortal'); // Navigate to pharmacistportal.js screen on success
+        navigation.navigate('PharmacistPortal',{pharmacist_id: data.pharmacist_id,
+          pharma_name: data.pharma_name,
+          pharma_loc: data.pharma_loc,
+          p_name: data.p_name,         // optionally pass pharmacist name
+          }); // Navigate to pharmacistportal.js screen on success
       } else {
         Alert.alert("Invalid credentials", "Account ID or Password is incorrect.");
       }
