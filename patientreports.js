@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,50 +8,39 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
+  ActivityIndicator,
 } from "react-native";
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { supabase } from "./supabaseClient";
+// Adjust as needed
 
-// Enable LayoutAnimation for Android
-if (
-  Platform.OS === "android" &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 export default function PatientReports({ route }) {
-  const { patient_name = "Unknown", age = "N/A", gender = "N/A" } =
-    route.params || {};
-
-  // Sample reports with added titles for each
-  const reports = [
-    {
-      id: "1",
-      title: "Headache Remedy",
-      remedy: "Stay hydrated and rest well. Avoid heavy meals.",
-      medication: "Paracetamol 500mg - 3 times a day for 5 days",
-      nextConsultation: "2025-09-14",
-    },
-    {
-      id: "2",
-      title: "Asthma Follow-up",
-      remedy: "Practice breathing exercises. Avoid exposure to dust.",
-      medication: "Salbutamol inhaler - as needed",
-      nextConsultation: "2025-09-20",
-    },
-    {
-      id: "3",
-      title: "Monthly Checkup",
-      remedy: "Maintain a balanced diet and monitor sugar levels.",
-      medication: "Metformin 500mg - twice daily",
-      nextConsultation: "2025-10-01",
-    },
-  ];
-
+  const { patient_name = "Unknown", age = "N/A", gender = "N/A" } = route.params || {};
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState([]);
 
-  // Toggle expand/collapse
+  useEffect(() => {
+    const fetchReports = async () => {
+      const { data, error } = await supabase
+        .from("reports")
+        .select("*")
+        .order("id", { ascending: true });
+      if (error) {
+        console.error("Error fetching reports:", error.message);
+      } else {
+        setReports(data);
+      }
+      setLoading(false);
+    };
+    fetchReports();
+  }, []);
+
   const toggleExpand = (id) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (expandedIds.includes(id)) {
@@ -61,7 +50,6 @@ export default function PatientReports({ route }) {
     }
   };
 
-  // Generate HTML content for PDF
   const generateHTML = (report) => `
     <html>
       <head>
@@ -76,29 +64,27 @@ export default function PatientReports({ route }) {
         </style>
       </head>
       <body>
-        <h1>${report.title}</h1>
+        <h1>${report.subject}</h1>
         <div class="header">
           <div class="left">
+            <strong>Patient ID:</strong> ${report.patient_id}
             <strong>Patient Name:</strong> ${patient_name}
             <strong>Age:</strong> ${age}
             <strong>Gender:</strong> ${gender}
           </div>
           <div class="right">
-            <strong>Doctor:</strong> Dr. Vickram
-            <strong>Date:</strong> 07/09/2025
+            <strong>Doctor:</strong> ${report.dr_name}
+            <strong>Next Consultation:</strong> ${report.next_con}
           </div>
         </div>
         <h2>Doctor's Remedy:</h2>
-        <p>${report.remedy}</p>
+        <p>${report.dr_rmdy}</p>
         <h2>Prescribed Medication:</h2>
-        <p>${report.medication}</p>
-        <h2>Next Consultation:</h2>
-        <p>${report.nextConsultation}</p>
+        <p>${report.pres_med}</p>
       </body>
     </html>
   `;
 
-  // Print or Save as PDF
   const printPDF = async (report) => {
     const html = generateHTML(report);
     try {
@@ -119,59 +105,64 @@ export default function PatientReports({ route }) {
       <View style={styles.headerRow}>
         <Text style={styles.header}>Patient Reports</Text>
       </View>
-
-      {reports.map((report) => {
-        const expanded = expandedIds.includes(report.id);
-        return (
-          <View key={report.id} style={styles.reportContainer}>
-            <View style={styles.topRow}>
-              <View>
-                <Text style={styles.reportTitle}>{report.title}</Text>
-              </View>
-              <View style={styles.rightTop}>
-                <Text style={styles.doctorName}>Dr. Vickram</Text>
-                <Text style={styles.date}>07/09/2025</Text>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              style={styles.expandButton}
-              onPress={() => toggleExpand(report.id)}
-            >
-              <Text style={styles.expandButtonText}>{expanded ? "Hide Details" : "Show Details"}</Text>
-            </TouchableOpacity>
-
-            {expanded && (
-              <>
-                <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>Patient:</Text>
-                  <Text style={styles.sectionText}>
-                    {report.patientName ?? patient_name}, {age} years, {gender}
-                  </Text>
-                </View>
-                <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>Doctor's Remedy:</Text>
-                  <Text style={styles.sectionText}>{report.remedy}</Text>
-                </View>
-                <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>Prescribed Medication:</Text>
-                  <Text style={styles.sectionText}>{report.medication}</Text>
-                </View>
-                <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>Next Consultation:</Text>
-                  <Text style={styles.sectionText}>{report.nextConsultation}</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#205099" />
+      ) : (
+        reports
+          .filter(report => report.subject?.trim().toLowerCase() !== "you're having a heart attack")
+          .map((report) => {
+            const expanded = expandedIds.includes(report.id);
+            return (
+              <View key={report.id} style={styles.reportContainer}>
+                <View style={styles.topRow}>
+                  <View>
+                    <Text style={styles.reportTitle}>{report.subject}</Text>
+                  </View>
+                  <View style={styles.rightTop}>
+                    <Text style={styles.doctorName}>{report.dr_name}</Text>
+                    <Text style={styles.date}>{report.next_con}</Text>
+                  </View>
                 </View>
                 <TouchableOpacity
-                  style={styles.downloadButton}
-                  onPress={() => printPDF(report)}
+                  style={styles.expandButton}
+                  onPress={() => toggleExpand(report.id)}
                 >
-                  <Text style={styles.downloadButtonText}>Download PDF</Text>
+                  <Text style={styles.expandButtonText}>
+                    {expanded ? "Hide Details" : "Show Details"}
+                  </Text>
                 </TouchableOpacity>
-              </>
-            )}
-          </View>
-        );
-      })}
+                {expanded && (
+                  <>
+                    <View style={styles.section}>
+                      <Text style={styles.sectionLabel}>Patient:</Text>
+                      <Text style={styles.sectionText}>
+                        {report.patient_id}, {patient_name}, {age} years, {gender}
+                      </Text>
+                    </View>
+                    <View style={styles.section}>
+                      <Text style={styles.sectionLabel}>Doctor's Remedy:</Text>
+                      <Text style={styles.sectionText}>{report.dr_rmdy}</Text>
+                    </View>
+                    <View style={styles.section}>
+                      <Text style={styles.sectionLabel}>Prescribed Medication:</Text>
+                      <Text style={styles.sectionText}>{report.pres_med}</Text>
+                    </View>
+                    <View style={styles.section}>
+                      <Text style={styles.sectionLabel}>Next Consultation:</Text>
+                      <Text style={styles.sectionText}>{report.next_con}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.downloadButton}
+                      onPress={() => printPDF(report)}
+                    >
+                      <Text style={styles.downloadButtonText}>Download PDF</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            );
+          })
+      )}
     </ScrollView>
   );
 }
@@ -191,7 +182,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "bold",
     color: "#3a4c5a",
-    marginTop:12,
+    marginTop: 12,
   },
   reportContainer: {
     backgroundColor: "#fff",
