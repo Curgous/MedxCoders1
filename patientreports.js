@@ -20,17 +20,28 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 export default function PatientReports({ route }) {
-  const { patient_name = "Unknown", age = "N/A", gender = "N/A" } = route.params || {};
+  const {
+    patient_name = "Unknown",
+    age = "N/A",
+    gender = "N/A",
+    patient_no // Extract patient_no from route params
+  } = route.params || {};
+  console.log(patient_no);
+
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState([]);
 
   useEffect(() => {
     const fetchReports = async () => {
-      const { data, error } = await supabase
-        .from("reports")
-        .select("*")
-        .order("id", { ascending: true });
+      let query = supabase.from("reports").select("*").order("id", { ascending: true });
+
+      if (patient_no) {
+        query = query.eq("patient_id", patient_no);
+      }
+
+      const { data, error } = await query;
+
       if (error) {
         console.error("Error fetching reports:", error.message);
       } else {
@@ -39,7 +50,7 @@ export default function PatientReports({ route }) {
       setLoading(false);
     };
     fetchReports();
-  }, []);
+  }, [patient_no]);
 
   const toggleExpand = (id) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -109,6 +120,7 @@ export default function PatientReports({ route }) {
         <ActivityIndicator size="large" color="#205099" />
       ) : (
         reports
+          // Optionally filter out unwanted subjects here
           .filter(report => report.subject?.trim().toLowerCase() !== "you're having a heart attack")
           .map((report) => {
             const expanded = expandedIds.includes(report.id);
@@ -123,10 +135,7 @@ export default function PatientReports({ route }) {
                     <Text style={styles.date}>{report.next_con}</Text>
                   </View>
                 </View>
-                <TouchableOpacity
-                  style={styles.expandButton}
-                  onPress={() => toggleExpand(report.id)}
-                >
+                <TouchableOpacity style={styles.expandButton} onPress={() => toggleExpand(report.id)}>
                   <Text style={styles.expandButtonText}>
                     {expanded ? "Hide Details" : "Show Details"}
                   </Text>
@@ -151,10 +160,7 @@ export default function PatientReports({ route }) {
                       <Text style={styles.sectionLabel}>Next Consultation:</Text>
                       <Text style={styles.sectionText}>{report.next_con}</Text>
                     </View>
-                    <TouchableOpacity
-                      style={styles.downloadButton}
-                      onPress={() => printPDF(report)}
-                    >
+                    <TouchableOpacity style={styles.downloadButton} onPress={() => printPDF(report)}>
                       <Text style={styles.downloadButtonText}>Download PDF</Text>
                     </TouchableOpacity>
                   </>

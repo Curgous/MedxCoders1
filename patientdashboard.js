@@ -67,6 +67,7 @@ export default function PatientDashboard({ navigation, route }) {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const t = translations[language];
   const { patient } = route.params;
+  console.log(patient);
 
   const selectLanguage = (lang) => {
     changeLanguage(lang);
@@ -126,7 +127,7 @@ export default function PatientDashboard({ navigation, route }) {
           <TouchableOpacity
             style={styles.gridButton}
             onPress={() => navigation.navigate('PatientReports', { 
-            patient_no:patient?.no||'',
+            patient_no:patient?.patient_no||'',
             patient_name: patient?.name || '',
             age: patient?.age || '',
             gender: patient?.gender || ''
