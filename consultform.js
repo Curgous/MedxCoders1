@@ -1,13 +1,18 @@
 import React, { useState, useContext } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  Image, Modal, ScrollView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Modal,
+  ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { LanguageContext } from './LanguageContext';
 import { supabase } from './supabaseClient'; // your supabase client import
-import { RotateOutDownLeft } from 'react-native-reanimated';
 
 const formTranslations = {
   en: {
@@ -176,8 +181,9 @@ export default function ConsultForm({ navigation, route }) {
   const { language, changeLanguage } = useContext(LanguageContext);
   const t = formTranslations[language];
 
-  // Access patient info from route paramsconst { patient } = route.params || {};
+  // Patient info
   const { patient } = route.params || {};
+  console.log(patient);
   const patient_id = patient?.id;
   const patient_name = patient?.name;
   const phone_number = patient?.phone_no;
@@ -195,7 +201,7 @@ export default function ConsultForm({ navigation, route }) {
     bp: false,
     tb: false,
     asthma: false,
-    other: false
+    other: false,
   });
   const [curMeds, setCurMeds] = useState('');
   const [date, setDate] = useState(null);
@@ -206,10 +212,9 @@ export default function ConsultForm({ navigation, route }) {
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
   const handleHistoryToggle = (field) => {
-    setHealthHistory(prev => ({ ...prev, [field]: !prev[field] }));
+    setHealthHistory((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
-  // Function to map translated values back to English
   const mapToEnglish = (category, value) => {
     if (!value) return '';
     const index = formTranslations[language][`${category}_opts`].indexOf(value);
@@ -222,7 +227,12 @@ export default function ConsultForm({ navigation, route }) {
     const categoryTypeEng = mapToEnglish('category_type', categoryType);
     const durationUnitEng = mapToEnglish('duration', durationUnit);
     const severityEng = mapToEnglish('severity', severity);
-    const hospitalTypeEng = hospitalType === 'private' ? 'Private' : hospitalType === 'government' ? 'Government' : '';
+    const hospitalTypeEng =
+      hospitalType === 'private'
+        ? 'Private'
+        : hospitalType === 'government'
+        ? 'Government'
+        : '';
 
     const isoDate = date ? date.toISOString().slice(0, 10) : null;
     const isoTime = time ? time.toTimeString().substr(0, 8) : null;
@@ -232,7 +242,7 @@ export default function ConsultForm({ navigation, route }) {
       bp: healthHistory.bp,
       tb: healthHistory.tb,
       asthma: healthHistory.asthma,
-      other: healthHistory.other
+      other: healthHistory.other,
     };
 
     const dataToInsert = {
@@ -251,7 +261,7 @@ export default function ConsultForm({ navigation, route }) {
       current_medicines: curMeds.trim(),
       date_of_visit: isoDate,
       time_of_visit: isoTime,
-      hospital_type: hospitalTypeEng
+      hospital_type: hospitalTypeEng,
     };
 
     try {
@@ -261,7 +271,6 @@ export default function ConsultForm({ navigation, route }) {
         console.error(error);
       } else {
         alert('Consultation submitted successfully!');
-        // Clear form fields
         setReason('');
         setSymptomCat('');
         setCategoryType('');
@@ -273,7 +282,7 @@ export default function ConsultForm({ navigation, route }) {
           bp: false,
           tb: false,
           asthma: false,
-          other: false
+          other: false,
         });
         setCurMeds('');
         setDate(null);
@@ -293,8 +302,24 @@ export default function ConsultForm({ navigation, route }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <Text style={styles.headerOutside}>{t.form}</Text>
+      {/* Button with image vid.png and title "Video conference" above header */}
+      <View style={styles.headerRow}>
+        <TouchableOpacity
+          style={styles.videoButton}
+          onPress={() => {navigation.navigate("Vidcon",{
+            patient_no: patient?.patient_no
+          });
+            
+          }}
+        >
+          <Image source={require('./assets/vid.png')} style={styles.videoIcon} />
+          <Text style={styles.videoButtonText}>Video conference</Text>
+        </TouchableOpacity>
+        
+      </View>
+
       <View style={styles.inputGroup}>
+        <Text style={styles.headerInside}>Consult Form</Text>
         <View style={styles.patientInfoCard}>
           <Text style={styles.patientInfoText}>Name: {patient_name || "-"}</Text>
           <Text style={styles.patientInfoText}>Age: {age || "-"}</Text>
@@ -306,11 +331,24 @@ export default function ConsultForm({ navigation, route }) {
           <Image source={require('./assets/lang.png')} style={styles.langImage} />
         </TouchableOpacity>
 
-        <Modal visible={langModal} transparent animationType="fade" onRequestClose={() => setLangModal(false)}>
-          <TouchableOpacity style={styles.langModalOverlay} activeOpacity={1} onPressOut={() => setLangModal(false)}>
+        <Modal
+          visible={langModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setLangModal(false)}
+        >
+          <TouchableOpacity
+            style={styles.langModalOverlay}
+            activeOpacity={1}
+            onPressOut={() => setLangModal(false)}
+          >
             <View style={styles.langDropdown}>
               {Object.keys(formTranslations).map((langKey) => (
-                <TouchableOpacity key={langKey} onPress={() => selectLanguage(langKey)} style={styles.langDropdownItem}>
+                <TouchableOpacity
+                  key={langKey}
+                  onPress={() => selectLanguage(langKey)}
+                  style={styles.langDropdownItem}
+                >
                   <Text style={styles.langDropdownText}>{langKey.toUpperCase()}</Text>
                 </TouchableOpacity>
               ))}
@@ -318,16 +356,30 @@ export default function ConsultForm({ navigation, route }) {
           </TouchableOpacity>
         </Modal>
 
+        {/* Form Fields Below */}
         <Text style={styles.label}>{t.reason}</Text>
-        <TextInput style={styles.input} placeholder={t.reason_ph} placeholderTextColor="#6499a1" value={reason} onChangeText={setReason} />
+        <TextInput
+          style={styles.input}
+          placeholder={t.reason_ph}
+          placeholderTextColor="#6499a1"
+          value={reason}
+          onChangeText={setReason}
+        />
 
+        {/* symptom category and category type - side by side */}
         <View style={styles.rowWrap}>
           <View style={styles.halfWidth}>
             <Text style={styles.label}>{t.symptom_cat}</Text>
             <View style={styles.pickerContainer}>
-              <Picker selectedValue={symptomCat} onValueChange={setSymptomCat} style={styles.picker}>
+              <Picker
+                selectedValue={symptomCat}
+                onValueChange={setSymptomCat}
+                style={styles.picker}
+              >
                 <Picker.Item label={t.symptom_cat} value="" />
-                {t.symptom_cat_opts.map(opt => <Picker.Item key={opt} label={opt} value={opt} />)}
+                {t.symptom_cat_opts.map((opt) => (
+                  <Picker.Item key={opt} label={opt} value={opt} />
+                ))}
               </Picker>
             </View>
           </View>
@@ -335,22 +387,43 @@ export default function ConsultForm({ navigation, route }) {
           <View style={styles.halfWidth}>
             <Text style={styles.label}>{t.category_type}</Text>
             <View style={styles.pickerContainer}>
-              <Picker selectedValue={categoryType} onValueChange={setCategoryType} style={styles.picker}>
+              <Picker
+                selectedValue={categoryType}
+                onValueChange={setCategoryType}
+                style={styles.picker}
+              >
                 <Picker.Item label={t.category_type} value="" />
-                {t.category_type_opts.map(opt => <Picker.Item key={opt} label={opt} value={opt} />)}
+                {t.category_type_opts.map((opt) => (
+                  <Picker.Item key={opt} label={opt} value={opt} />
+                ))}
               </Picker>
             </View>
           </View>
         </View>
 
         <Text style={styles.label}>{t.symptoms}</Text>
-        <TextInput style={styles.input} placeholder={t.symptoms_ph} placeholderTextColor="#6499a1" value={symptoms} onChangeText={setSymptoms} />
+        <TextInput
+          style={styles.input}
+          placeholder={t.symptoms_ph}
+          placeholderTextColor="#6499a1"
+          value={symptoms}
+          onChangeText={setSymptoms}
+        />
 
         <Text style={styles.label}>{t.duration}</Text>
         <View style={styles.radioGroup}>
-          {t.duration_opts.map(opt => (
-            <TouchableOpacity key={opt} style={styles.radioOption} onPress={() => setDurationUnit(opt)}>
-              <View style={[styles.radioCircle, durationUnit === opt && styles.radioCircleSelected]} />
+          {t.duration_opts.map((opt) => (
+            <TouchableOpacity
+              key={opt}
+              style={styles.radioOption}
+              onPress={() => setDurationUnit(opt)}
+            >
+              <View
+                style={[
+                  styles.radioCircle,
+                  durationUnit === opt && styles.radioCircleSelected,
+                ]}
+              />
               <Text style={styles.radioLabel}>{opt}</Text>
             </TouchableOpacity>
           ))}
@@ -358,41 +431,105 @@ export default function ConsultForm({ navigation, route }) {
 
         <Text style={styles.label}>{t.severity}</Text>
         <View style={styles.severityGroup}>
-          {t.severity_opts.map(opt => (
-            <TouchableOpacity key={opt} style={[styles.severityButton, severity === opt && styles.severitySelected]} onPress={() => setSeverity(opt)}>
-              <Text style={[styles.severityText, severity === opt && styles.severityTextSelected]}>{opt}</Text>
+          {t.severity_opts.map((opt) => (
+            <TouchableOpacity
+              key={opt}
+              style={[
+                styles.severityButton,
+                severity === opt && styles.severitySelected,
+              ]}
+              onPress={() => setSeverity(opt)}
+            >
+              <Text
+                style={[
+                  styles.severityText,
+                  severity === opt && styles.severityTextSelected,
+                ]}
+              >
+                {opt}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
 
         <Text style={styles.label}>{t.health_history}</Text>
         <View style={styles.checkboxGroup}>
-          {['diabetes', 'bp', 'tb', 'asthma', 'other'].map(key => (
-            <TouchableOpacity key={key} style={styles.checkboxRow} onPress={() => handleHistoryToggle(key)}>
-              <View style={[styles.checkbox, healthHistory[key] && styles.checkboxChecked]} />
+          {["diabetes", "bp", "tb", "asthma", "other"].map((key) => (
+            <TouchableOpacity
+              key={key}
+              style={styles.checkboxRow}
+              onPress={() => handleHistoryToggle(key)}
+            >
+              <View
+                style={[styles.checkbox, healthHistory[key] && styles.checkboxChecked]}
+              />
               <Text style={styles.checkboxLabel}>{t[key]}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         <Text style={styles.label}>{t.cur_meds}</Text>
-        <TextInput style={styles.input} placeholder={t.cur_meds_ph} placeholderTextColor="#6499a1" value={curMeds} onChangeText={setCurMeds} />
+        <TextInput
+          style={styles.input}
+          placeholder={t.cur_meds_ph}
+          placeholderTextColor="#6499a1"
+          value={curMeds}
+          onChangeText={setCurMeds}
+        />
 
         <Text style={styles.label}>{t.date}</Text>
         <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
-          <TextInput style={styles.input} placeholder={t.date_ph} placeholderTextColor="#6499a1" value={date ? date.toLocaleDateString() : ''} editable={false} pointerEvents="none" />
+          <TextInput
+            style={styles.input}
+            placeholder={t.date_ph}
+            placeholderTextColor="#6499a1"
+            value={date ? date.toLocaleDateString() : ""}
+            editable={false}
+            pointerEvents="none"
+          />
         </TouchableOpacity>
-        <DateTimePickerModal isVisible={isDatePickerVisible} mode="date" onConfirm={(pickedDate) => { setDatePickerVisible(false); setDate(pickedDate); }} onCancel={() => setDatePickerVisible(false)} />
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={(pickedDate) => {
+            setDatePickerVisible(false);
+            setDate(pickedDate);
+          }}
+          onCancel={() => setDatePickerVisible(false)}
+        />
 
         <Text style={styles.label}>{t.time}</Text>
         <TouchableOpacity onPress={() => setTimePickerVisible(true)}>
-          <TextInput style={styles.input} placeholder={t.time_ph} placeholderTextColor="#6499a1" value={time ? time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''} editable={false} pointerEvents="none" />
+          <TextInput
+            style={styles.input}
+            placeholder={t.time_ph}
+            placeholderTextColor="#6499a1"
+            value={
+              time
+                ? time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                : ""
+            }
+            editable={false}
+            pointerEvents="none"
+          />
         </TouchableOpacity>
-        <DateTimePickerModal isVisible={isTimePickerVisible} mode="time" onConfirm={(pickedTime) => { setTimePickerVisible(false); setTime(pickedTime); }} onCancel={() => setTimePickerVisible(false)} />
+        <DateTimePickerModal
+          isVisible={isTimePickerVisible}
+          mode="time"
+          onConfirm={(pickedTime) => {
+            setTimePickerVisible(false);
+            setTime(pickedTime);
+          }}
+          onCancel={() => setTimePickerVisible(false)}
+        />
 
         <Text style={styles.label}>{t.hosp}</Text>
         <View style={styles.pickerContainer}>
-          <Picker selectedValue={hospitalType} onValueChange={setHospitalType} style={styles.picker}>
+          <Picker
+            selectedValue={hospitalType}
+            onValueChange={setHospitalType}
+            style={styles.picker}
+          >
             <Picker.Item label={t.select_hosp} value="" />
             <Picker.Item label={t.private} value="private" />
             <Picker.Item label={t.govt} value="government" />
@@ -402,7 +539,6 @@ export default function ConsultForm({ navigation, route }) {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitText}>{t.submit}</Text>
         </TouchableOpacity>
-
       </View>
     </ScrollView>
   );
@@ -413,19 +549,46 @@ const styles = StyleSheet.create({
     backgroundColor: "#eaf7fa",
     padding: 24,
     flexGrow: 1,
-    alignItems: "center"
+    alignItems: "center",
   },
-  headerOutside: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#3a4d5c",
-    marginTop: 16,
-    marginBottom: 18,
-    alignSelf: "flex-start",
-    width: "100%",
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
     maxWidth: 400,
-    flexWrap: "wrap"
-  },
+    marginBottom: 16,
+},
+  headerInside: {
+    fontSize: 24,
+    marginBottom:12,
+    fontWeight: 'bold',
+    color: '#3a4c5c',
+    flex: 1,
+},
+  videoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#36b0aa',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginTop:16,
+    marginRight: 10,
+},
+  videoIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
+    marginRight: 6,
+},
+  videoButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+},
+
+  
   inputGroup: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -434,7 +597,14 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 400,
     marginBottom: 20,
-    position: "relative"
+    position: "relative",
+  },
+  patientInfoCard: {
+    marginBottom: 8,
+  },
+  patientInfoText: {
+    color: "#205099",
+    marginBottom: 2,
   },
   langButton: {
     position: "absolute",
@@ -447,33 +617,33 @@ const styles = StyleSheet.create({
     height: 35,
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 1000
+    zIndex: 1000,
   },
   langImage: {
     width: 50,
     height: 50,
-    resizeMode: "contain"
+    resizeMode: "contain",
   },
   langModalOverlay: {
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "flex-end",
     marginTop: 56,
-    marginRight: 18
+    marginRight: 18,
   },
   langDropdown: {
     backgroundColor: "#fff",
     padding: 10,
     borderRadius: 8,
-    elevation: 8
+    elevation: 8,
   },
   langDropdownItem: {
     paddingVertical: 8,
-    paddingHorizontal: 12
+    paddingHorizontal: 12,
   },
   langDropdownText: {
     fontSize: 16,
-    color: "#205099"
+    color: "#205099",
   },
   label: {
     fontSize: 16,
@@ -481,7 +651,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 6,
     fontWeight: "bold",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
   input: {
     backgroundColor: "#eaf7fa",
@@ -493,40 +663,40 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#6499a1",
     minWidth: 160,
-    flexShrink: 1
+    flexShrink: 1,
   },
   pickerContainer: {
     backgroundColor: "#eaf7fa",
     borderRadius: 6,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: "#6499a1"
+    borderColor: "#6499a1",
   },
   picker: {
     height: 48,
     width: "100%",
-    color: "#205099"
+    color: "#205099",
   },
   rowWrap: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   halfWidth: {
     flexBasis: "48%",
     minWidth: 160,
-    marginBottom: 12
+    marginBottom: 12,
   },
   radioGroup: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 8
+    marginBottom: 8,
   },
   radioOption: {
     flexDirection: "row",
     alignItems: "center",
     marginRight: 12,
-    marginBottom: 8
+    marginBottom: 8,
   },
   radioCircle: {
     width: 20,
@@ -535,20 +705,20 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#205099",
     marginRight: 6,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   radioCircleSelected: {
     backgroundColor: "#36b5b0",
-    borderColor: "#36b5b0"
+    borderColor: "#36b5b0",
   },
   radioLabel: {
     fontSize: 15,
-    color: "#205099"
+    color: "#205099",
   },
   severityGroup: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginVertical: 6
+    marginVertical: 6,
   },
   severityButton: {
     backgroundColor: "#eaf7fa",
@@ -558,30 +728,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#6499a1",
     marginRight: 12,
-    marginBottom: 8
+    marginBottom: 8,
   },
   severitySelected: {
     backgroundColor: "#36b5b0",
-    borderColor: "#36b5b0"
+    borderColor: "#36b5b0",
   },
   severityText: {
     fontSize: 15,
     fontWeight: "bold",
-    color: "#205099"
+    color: "#205099",
   },
   severityTextSelected: {
-    color: "#fff"
+    color: "#fff",
   },
   checkboxGroup: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 8
+    marginBottom: 8,
   },
   checkboxRow: {
     flexDirection: "row",
     alignItems: "center",
     marginRight: 15,
-    marginBottom: 7
+    marginBottom: 7,
   },
   checkbox: {
     width: 20,
@@ -590,26 +760,26 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#205099",
     marginRight: 7,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   checkboxChecked: {
     backgroundColor: "#36b5b0",
-    borderColor: "#36b5b0"
+    borderColor: "#36b5b0",
   },
   checkboxLabel: {
     fontSize: 15,
-    color: "#205099"
+    color: "#205099",
   },
   submitButton: {
     backgroundColor: "#36b5b0",
     padding: 14,
     borderRadius: 10,
     marginTop: 28,
-    alignItems: "center"
+    alignItems: "center",
   },
   submitText: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 16
-  }
+    fontSize: 16,
+  },
 });

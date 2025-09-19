@@ -23,7 +23,8 @@ import PharmacistPortal from './pharmacistportal';
 import AddRemMedicine from './addremmedicine';
 import CheckDemand from './checkdemand';
 import ReportGen from "./reportgen";
-
+import Counsche from './counsche';
+import Vidcon from './vidcon';
 // Import LanguageProvider and LanguageContext
 import { LanguageProvider, LanguageContext } from './LanguageContext';
 
@@ -167,6 +168,8 @@ export default function App() {
             options={{ title: "Current Medicine Demands" }} // optional
           />
           <Stack.Screen name="ReportGen" component={ReportGen} />
+          <Stack.Screen name="Counsche" component={Counsche} />
+          <Stack.Screen name="Vidcon" component={Vidcon} />
         </Stack.Navigator>
       </NavigationContainer>
     </LanguageProvider>
