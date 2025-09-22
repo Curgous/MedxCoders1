@@ -25,6 +25,7 @@ import CheckDemand from './checkdemand';
 import ReportGen from "./reportgen";
 import Counsche from './counsche';
 import Vidcon from './vidcon';
+import HealthAwareness from './healthawareness';
 // Import LanguageProvider and LanguageContext
 import { LanguageProvider, LanguageContext } from './LanguageContext';
 
@@ -170,6 +171,7 @@ export default function App() {
           <Stack.Screen name="ReportGen" component={ReportGen} />
           <Stack.Screen name="Counsche" component={Counsche} />
           <Stack.Screen name="Vidcon" component={Vidcon} />
+          <Stack.Screen name="HealthAwareness" component={HealthAwareness} />
         </Stack.Navigator>
       </NavigationContainer>
     </LanguageProvider>

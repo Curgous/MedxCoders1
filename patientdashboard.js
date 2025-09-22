@@ -7,8 +7,9 @@ import { LanguageContext } from './LanguageContext';
 const translations = {
   en: {
     title: 'Your Health. Anytime. Anywhere.',
-    subtitle: 'Connecting patients, doctors, and pharmacies seamlessly.',
+    subtitle: 'Connecting patients, doctors, and pharmacies seamlessly.',
     consult: 'CONSULT NOW',
+    healthAwareness: 'HEALTH AWARENESS',
     emergency: 'EMERGENCY CARE',
     pharmacy: 'PHARMACY',
     symptom: 'SYMPTOM CHECKER',
@@ -20,6 +21,7 @@ const translations = {
     title: 'ਤੁਹਾਡੇ ਡਾਕਟਰ ਦੀ ਭਾਲ ਕਰ ਰਹੇ ਹੋ?',
     subtitle: 'ਅਸੀਂ ਤੁਹਾਨੂੰ ਉਹਨਾਂ ਡਾਕਟਰਾਂ ਨਾਲ ਜੋੜਦੇ ਹਾਂ ਜੋ ਤੁਹਾਡੀ ਭਾਸ਼ਾ ਬੋਲਦੇ ਹਨ',
     consult: 'ਹੁਣ ਸੰਪਰਕ ਕਰੋ',
+    healthAwareness: 'ਸਿਹਤ ਜਾਗਰੂਕਤਾ',
     emergency: 'ਐਮਰਜੈਂਸੀ ਕੇਅਰ',
     pharmacy: 'ਫਾਰਮੇਸੀ',
     symptom: 'ਲੱਛਣ ਚੈੱਕਰ',
@@ -31,6 +33,7 @@ const translations = {
     title: 'क्या आप डॉक्टर ढूंढ रहे हैं?',
     subtitle: 'हम आपको ऐसे डॉक्टरों से जोड़ते हैं जो आपकी पसंदीदा भाषा बोलते हैं',
     consult: 'अभी परामर्श करें',
+    healthAwareness: 'स्वास्थ्य जागरूकता',
     emergency: 'आपातकालीन देखभाल',
     pharmacy: 'फार्मेसी',
     symptom: 'लक्षण चेकर',
@@ -42,6 +45,7 @@ const translations = {
     title: 'আপনার ডাক্তার খুঁজছেন?',
     subtitle: 'আমরা আপনাকে সেই ডাক্তারদের সাথে যুক্ত করি যারা আপনার ভাষায় কথা বলেন',
     consult: 'এখন পরামর্শ করুন',
+    healthAwareness: 'স্বাস্থ্য সচেতনতা',
     emergency: 'জরুরি সেবা',
     pharmacy: 'ফার্মেসি',
     symptom: 'লক্ষণ চেকার',
@@ -53,6 +57,7 @@ const translations = {
     title: 'உங்கள் மருத்துவரைத் தேடுகிறீர்களா?',
     subtitle: 'நாங்கள் உங்கள் மொழியில் பேசும் மருத்துவர்களை இணைக்கிறோம்',
     consult: 'இப்போது கலந்துரையாடவும்',
+    healthAwareness: 'சுகாதார விழிப்புணர்வு',
     emergency: 'அவசர சிகிச்சை',
     pharmacy: 'மருந்தகம்',
     symptom: 'அறிகுறி சேக்கர்',
@@ -110,6 +115,14 @@ export default function PatientDashboard({ navigation, route }) {
         {/* Consult button */}
         <TouchableOpacity style={styles.consult} onPress={() => navigation.navigate('consultform', { patient })}>
           <Text style={styles.consultText}>{t.consult}</Text>
+        </TouchableOpacity>
+
+        {/* Health Awareness button */}
+        <TouchableOpacity 
+          style={styles.healthAwarenessButton} 
+          onPress={() => navigation.navigate('HealthAwareness')}
+        >
+          <Text style={styles.healthAwarenessText}>{t.healthAwareness}</Text>
         </TouchableOpacity>
 
         {/* Grid Buttons */}
@@ -188,7 +201,9 @@ export default function PatientDashboard({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { 
+    flex: 1 
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -196,19 +211,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
   },
-  logo: { fontSize: 24, fontWeight: 'bold', color: '#3a4d5c' },
-
+  logo: { 
+    fontSize: 24, 
+    fontWeight: 'bold', 
+    color: '#3a4d5c' 
+  },
   profileCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginTop:10,
+    marginTop: 10,
     backgroundColor: '#36b5b0',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  profileInitial: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-
+  profileInitial: { 
+    color: '#fff', 
+    fontSize: 18, 
+    fontWeight: 'bold' 
+  },
   emergencyButton: {
     flexDirection: 'row',
     backgroundColor: '#d9534f',
@@ -217,15 +238,52 @@ const styles = StyleSheet.create({
     margin: 20,
     alignItems: 'center',
   },
-  emergencyIcon: { width: 40, height: 40, marginRight: 12, tintColor: '#fff' },
-  emergencyTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  emergencySubtitle: { color: '#fff', fontSize: 14 },
-
-  title: { fontSize: 22, fontWeight: 'bold', marginTop: 10, textAlign: 'left', color: '#205099', paddingHorizontal: 20 },
-  subtitle: { fontSize: 14, marginBottom: 18, textAlign: 'left', color: '#434c59', paddingHorizontal: 20 },
-
+  emergencyIcon: { 
+    width: 40, 
+    height: 40, 
+    marginRight: 12, 
+    tintColor: '#fff' 
+  },
+  emergencyTitle: { 
+    color: '#fff', 
+    fontSize: 18, 
+    fontWeight: 'bold' 
+  },
+  emergencySubtitle: { 
+    color: '#fff', 
+    fontSize: 14 
+  },
+  title: { 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    marginTop: 10, 
+    textAlign: 'left', 
+    color: '#205099', 
+    paddingHorizontal: 20 
+  },
+  subtitle: { 
+    fontSize: 14, 
+    marginBottom: 18, 
+    textAlign: 'left', 
+    color: '#434c59', 
+    paddingHorizontal: 20 
+  },
   consult: {
     backgroundColor: '#36b5b0',
+    alignSelf: 'flex-start',
+    paddingVertical: 12,
+    paddingHorizontal: 28,
+    borderRadius: 8,
+    marginBottom: 12,
+    marginHorizontal: 20,
+  },
+  consultText: { 
+    color: '#fff', 
+    fontWeight: 'bold', 
+    fontSize: 16 
+  },
+  healthAwarenessButton: {
+    backgroundColor: '#2ecc71',
     alignSelf: 'flex-start',
     paddingVertical: 12,
     paddingHorizontal: 28,
@@ -233,8 +291,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginHorizontal: 20,
   },
-  consultText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-
+  healthAwarenessText: { 
+    color: '#fff', 
+    fontWeight: 'bold', 
+    fontSize: 16 
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -252,22 +313,50 @@ const styles = StyleSheet.create({
     elevation: 3,
     paddingVertical: 16,
   },
-  buttonImage: { width: 55, height: 55, marginBottom: 8, resizeMode: 'contain' },
-  buttonText: { fontWeight: 'bold', color: '#333', textAlign: 'center', fontSize: 15 },
-
+  buttonImage: { 
+    width: 55, 
+    height: 55, 
+    marginBottom: 8, 
+    resizeMode: 'contain' 
+  },
+  buttonText: { 
+    fontWeight: 'bold', 
+    color: '#333', 
+    textAlign: 'center', 
+    fontSize: 15 
+  },
   langSelectButton: {
     backgroundColor: '#205099',
     paddingVertical: 12,
     marginHorizontal: 80,
     borderRadius: 8,
-    marginTop: 30,
+    marginTop: 15,
     marginBottom: 40,
     alignItems: 'center',
   },
-  langSelectText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-
-  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  dropdown: { backgroundColor: '#fff', padding: 16, borderRadius: 10, elevation: 8 },
-  dropdownItem: { paddingVertical: 8 },
-  dropdownText: { fontSize: 16, color: '#205099' },
+  langSelectText: { 
+    color: '#fff', 
+    fontSize: 16, 
+    fontWeight: 'bold' 
+  },
+  modalOverlay: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  dropdown: { 
+    backgroundColor: '#fff', 
+    padding: 16, 
+    borderRadius: 10, 
+    elevation: 8,
+    minWidth: 150,
+  },
+  dropdownItem: { 
+    paddingVertical: 8 
+  },
+  dropdownText: { 
+    fontSize: 16, 
+    color: '#205099' 
+  },
 });
