@@ -12,7 +12,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { LanguageContext } from './LanguageContext';
-import { supabase } from './supabaseClient'; // your supabase client import
+import { supabase } from './supabaseClient';
 
 const formTranslations = {
   en: {
@@ -118,7 +118,7 @@ const formTranslations = {
     symptom_cat: "লক্ষণ শ্রেণী",
     symptom_cat_opts: ["সাধারণ", "শ্বাসজনিত", "হার্ট", "পাচন", "অন্যান্য"],
     category_type: "প্রকার",
-    category_type_opts: ["প্রাথমিক", "বারবার হওয়া", "দীর্ঘস্থায়ী", "অন্যান্য"],
+    category_type_opts: ["প্রাথমিক", "বারবার হওয়া", "দীর্ঘস্থায়ী", "অন্যান্য"],
     symptoms: "লক্ষণ",
     symptoms_ph: "উদা: মাথাব্যথা",
     duration: "সময়কাল",
@@ -150,7 +150,7 @@ const formTranslations = {
     symptom_cat: "குறிப்பு வகை",
     symptom_cat_opts: ["தொகுதி", "மூச்சுவர்க்கு", "இதயம்", "அஹாரம்", "மற்றவை"],
     category_type: "வகை",
-    category_type_opts: ["முதன்மை", "மீண்டும்", "நோய்ப்பு", "மற்றவை"],
+    category_type_opts: ["முதன்மை", "மீண்டும்", "நோய்ப்பு", "மற்றவை"],
     symptoms: "குறிப்புகள்",
     symptoms_ph: "உதா: தலைவலி",
     duration: "நாட்கள்",
@@ -213,6 +213,13 @@ export default function ConsultForm({ navigation, route }) {
 
   const handleHistoryToggle = (field) => {
     setHealthHistory((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const handleVoiceInput = (fieldName) => {
+    // Placeholder for voice input functionality
+    console.log(`Voice input for ${fieldName}`);
+    // You can implement speech-to-text here
+    // For now, it's just a placeholder function
   };
 
   const mapToEnglish = (category, value) => {
@@ -309,13 +316,11 @@ export default function ConsultForm({ navigation, route }) {
           onPress={() => {navigation.navigate("Vidcon",{
             patient_no: patient?.patient_no
           });
-            
           }}
         >
           <Image source={require('./assets/vid.png')} style={styles.videoIcon} />
           <Text style={styles.videoButtonText}>Video conference</Text>
         </TouchableOpacity>
-        
       </View>
 
       <View style={styles.inputGroup}>
@@ -358,13 +363,21 @@ export default function ConsultForm({ navigation, route }) {
 
         {/* Form Fields Below */}
         <Text style={styles.label}>{t.reason}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t.reason_ph}
-          placeholderTextColor="#6499a1"
-          value={reason}
-          onChangeText={setReason}
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputWithMic}
+            placeholder={t.reason_ph}
+            placeholderTextColor="#6499a1"
+            value={reason}
+            onChangeText={setReason}
+          />
+          <TouchableOpacity 
+            style={styles.micButton}
+            onPress={() => handleVoiceInput('reason')}
+          >
+            <Image source={require('./assets/mic.png')} style={styles.micIcon} />
+          </TouchableOpacity>
+        </View>
 
         {/* symptom category and category type - side by side */}
         <View style={styles.rowWrap}>
@@ -402,13 +415,21 @@ export default function ConsultForm({ navigation, route }) {
         </View>
 
         <Text style={styles.label}>{t.symptoms}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t.symptoms_ph}
-          placeholderTextColor="#6499a1"
-          value={symptoms}
-          onChangeText={setSymptoms}
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputWithMic}
+            placeholder={t.symptoms_ph}
+            placeholderTextColor="#6499a1"
+            value={symptoms}
+            onChangeText={setSymptoms}
+          />
+          <TouchableOpacity 
+            style={styles.micButton}
+            onPress={() => handleVoiceInput('symptoms')}
+          >
+            <Image source={require('./assets/mic.png')} style={styles.micIcon} />
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.label}>{t.duration}</Text>
         <View style={styles.radioGroup}>
@@ -469,25 +490,35 @@ export default function ConsultForm({ navigation, route }) {
         </View>
 
         <Text style={styles.label}>{t.cur_meds}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t.cur_meds_ph}
-          placeholderTextColor="#6499a1"
-          value={curMeds}
-          onChangeText={setCurMeds}
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputWithMic}
+            placeholder={t.cur_meds_ph}
+            placeholderTextColor="#6499a1"
+            value={curMeds}
+            onChangeText={setCurMeds}
+          />
+          <TouchableOpacity 
+            style={styles.micButton}
+            onPress={() => handleVoiceInput('curMeds')}
+          >
+            <Image source={require('./assets/mic.png')} style={styles.micIcon} />
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.label}>{t.date}</Text>
-        <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
-          <TextInput
-            style={styles.input}
-            placeholder={t.date_ph}
-            placeholderTextColor="#6499a1"
-            value={date ? date.toLocaleDateString() : ""}
-            editable={false}
-            pointerEvents="none"
-          />
-        </TouchableOpacity>
+        <View style={styles.inputContainer}>
+          <TouchableOpacity onPress={() => setDatePickerVisible(true)} style={styles.dateTimeContainer}>
+            <TextInput
+              style={styles.inputWithMic}
+              placeholder={t.date_ph}
+              placeholderTextColor="#6499a1"
+              value={date ? date.toLocaleDateString() : ""}
+              editable={false}
+              pointerEvents="none"
+            />
+          </TouchableOpacity>
+        </View>
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           mode="date"
@@ -499,20 +530,22 @@ export default function ConsultForm({ navigation, route }) {
         />
 
         <Text style={styles.label}>{t.time}</Text>
-        <TouchableOpacity onPress={() => setTimePickerVisible(true)}>
-          <TextInput
-            style={styles.input}
-            placeholder={t.time_ph}
-            placeholderTextColor="#6499a1"
-            value={
-              time
-                ? time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                : ""
-            }
-            editable={false}
-            pointerEvents="none"
-          />
-        </TouchableOpacity>
+        <View style={styles.inputContainer}>
+          <TouchableOpacity onPress={() => setTimePickerVisible(true)} style={styles.dateTimeContainer}>
+            <TextInput
+              style={styles.inputWithMic}
+              placeholder={t.time_ph}
+              placeholderTextColor="#6499a1"
+              value={
+                time
+                  ? time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                  : ""
+              }
+              editable={false}
+              pointerEvents="none"
+            />
+          </TouchableOpacity>
+        </View>
         <DateTimePickerModal
           isVisible={isTimePickerVisible}
           mode="time"
@@ -558,14 +591,14 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 400,
     marginBottom: 16,
-},
+  },
   headerInside: {
     fontSize: 24,
-    marginBottom:12,
+    marginBottom: 12,
     fontWeight: 'bold',
     color: '#3a4c5c',
     flex: 1,
-},
+  },
   videoButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -573,22 +606,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
-    marginTop:16,
+    marginTop: 16,
     marginRight: 10,
-},
+  },
   videoIcon: {
     width: 20,
     height: 20,
     resizeMode: 'contain',
     marginRight: 6,
-},
+  },
   videoButtonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
-},
-
-  
+  },
   inputGroup: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -653,6 +684,41 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     flexWrap: "wrap",
   },
+  // New styles for input with mic button
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  inputWithMic: {
+    flex: 1,
+    backgroundColor: "#eaf7fa",
+    borderRadius: 6,
+    padding: 10,
+    fontSize: 16,
+    color: "#333",
+    borderWidth: 1,
+    borderColor: "#6499a1",
+    minWidth: 160,
+  },
+  micButton: {
+    marginLeft: 8,
+    padding: 8,
+    backgroundColor: "#36b5b0",
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  micIcon: {
+    width: 30,
+    height: 30,
+    resizeMode: 'contain',
+    tintColor: '#fff',
+  },
+  dateTimeContainer: {
+    flex: 1,
+  },
+  // Original input style for non-mic inputs
   input: {
     backgroundColor: "#eaf7fa",
     borderRadius: 6,

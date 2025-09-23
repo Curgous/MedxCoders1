@@ -47,7 +47,7 @@ const allSymptoms = {
     ],
     ta: [
         { id: 'cough', name: 'தும்மல்' },
-        { id: 'whooping_cough', name: 'உச்சி காசி' },
+        { id: 'whooping_cough', name: 'உச்சि காசி' },
         { id: 'high_temperature', name: 'உயர் வெப்பநிலை' },
         { id: 'low_temperature', name: 'குறைந்த வெப்பநிலை' },
         { id: 'acidity', name: 'அமிலப்பெருக்கு' },
@@ -153,16 +153,16 @@ export default function SymptomChecker() {
         ta: {
             symptomChecker: 'அறிகுறி தேடல்',
             selectSymptoms: 'அறிகுறிகள் தேர்வு செய்யவும்',
-            pickSymptoms: 'அறிகুறிகள் தேர்வு செய்யவும்',
+            pickSymptoms: 'அறிகுறிகள் தேர்வு செய்யவும்',
             searchPlaceholder: 'அறிகுறிகளை தேடு...',
             checkIllnesses: 'இல்லறைகள் சரிபார்க்கவும்',
             checking: 'சரிபார்க்கப்படுகிறத...',
             possibleIllnesses: 'சாத்தியமான அல்லடைகள்',
             selectAtLeastOne: 'கனிஸம் ஒரு அறிகுறியைக் தேர்ந்தெடுக்கவும்.',
-            unauthorized: 'தவறான API விசையோ உரিமையற்ற அணுகலோ.',
-            fetchFailed: 'Google Gemini API-இல் இருந்து இல்লறைகள் பெற முடியவில்லை.',
+            unauthorized: 'தவறான API விசையோ உரிமையற்ற அணுகலோ.',
+            fetchFailed: 'Google Gemini API-இல் இருந்து இல்லறைகள் பெற முடியவில்லை.',
             confirm: 'உறுதிப்படுத்தவும்',
-            translating: 'மொழியாக்கம் செய்யப்படுகிறது...',
+            translating: 'மொழியாক்கம் செய்யப்படுகிறது...',
         },
     };
 
@@ -180,6 +180,14 @@ export default function SymptomChecker() {
     const symptoms = allSymptoms[language] || allSymptoms.en;
 
     const onSelectedItemsChange = (items) => setSelectedSymptoms(items);
+
+    // Handle voice input for symptoms
+    const handleVoiceInput = () => {
+        // Placeholder for voice input functionality
+        console.log('Voice input for symptoms');
+        // You can implement speech-to-text here
+        // For now, it's just a placeholder function
+    };
 
     const handleCheckSymptoms = async () => {
         if (selectedSymptoms.length === 0) {
@@ -302,7 +310,7 @@ Requirements:
         { code: 'pa', label: 'ਪੰਜਾਬੀ' },
         { code: 'hi', label: 'हिन्दी' },
         { code: 'bn', label: 'বাংলা' },
-        { code: 'ta', label: 'தமிழ்' },
+        { code: 'ta', label: 'তমিল' },
     ];
 
     // ✅ Translation language options (same as above but for translation dropdown)
@@ -311,7 +319,7 @@ Requirements:
         { code: 'pa', label: 'ਪੰਜਾਬੀ' },
         { code: 'hi', label: 'हिन्दी' },
         { code: 'bn', label: 'বাংলা' },
-        { code: 'ta', label: 'தமிழ்' },
+        { code: 'ta', label: 'তমিল' },
     ];
 
     return (
@@ -346,7 +354,18 @@ Requirements:
                 </View>
             </View>
 
-            <Text style={styles.label}>{t.selectSymptoms}</Text>
+            {/* Modified label row with mic icon next to text */}
+            <View style={styles.labelRow}>
+                <Text style={styles.label}>{t.selectSymptoms}</Text>
+                <TouchableOpacity 
+                    style={styles.micButton}
+                    onPress={handleVoiceInput}
+                    activeOpacity={0.7}
+                >
+                    <Image source={require('./assets/mic.png')} style={styles.micIcon} />
+                </TouchableOpacity>
+            </View>
+
             <MultiSelect
                 items={symptoms}
                 uniqueKey="id"
@@ -479,11 +498,30 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#205099',
     },
+    // Updated styles for label row with mic button next to text
+    labelRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
     label: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#205099',
-        marginBottom: 8,
+    },
+    micButton: {
+        padding: 6,
+        backgroundColor: '#36b5b0',
+        borderRadius: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 8,
+    },
+    micIcon: {
+        width: 20,
+        height: 20,
+        resizeMode: 'contain',
+        tintColor: '#fff',
     },
     checkButton: {
         backgroundColor: '#36b5b0',
