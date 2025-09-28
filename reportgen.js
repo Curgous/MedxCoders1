@@ -55,7 +55,7 @@ export default function ReportGen({ route }) {
 
       // ✅ Call backend to send SMS
       // Replace 'YOUR_IP_ADDRESS' with your computer's actual IP address.
-      const twilioResponse = await fetch(`http://192.168.83.52:3000/twilio`, {
+      const twilioResponse = await fetch(`http://abc:3000/twilio`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
