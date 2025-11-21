@@ -45,7 +45,7 @@ export default function DoctorDashboard({ navigation, route }) {
           }}
         >
           <Image source={require('./assets/verify.png')} style={[styles.icon, styles.iconLarge]} />
-          <Text style={styles.actionText}>Verify Symptoms</Text>
+          <Text style={styles.actionText}>Verify Consults & Symptoms</Text>
         </TouchableOpacity>
       </View>
     </View>
