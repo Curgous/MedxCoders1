@@ -82,6 +82,7 @@ export default function ReportGen({ route }) {
       setPresMed("");
       setNextConsult(new Date());
     } catch (err) {
+      console.error("Error submitting report:", err);
       Alert.alert("Error", err.message || "Failed to submit report.");
     }
   };

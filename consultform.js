@@ -13,6 +13,8 @@ import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { LanguageContext } from './LanguageContext';
 import { supabase } from './supabaseClient';
+import Voice from '@react-native-voice/voice';
+
 
 const formTranslations = {
   en: {
@@ -214,12 +216,35 @@ export default function ConsultForm({ navigation, route }) {
   const handleHistoryToggle = (field) => {
     setHealthHistory((prev) => ({ ...prev, [field]: !prev[field] }));
   };
-
   const handleVoiceInput = (fieldName) => {
-    // Placeholder for voice input functionality
-    console.log(`Voice input for ${fieldName}`);
-    // You can implement speech-to-text here
-    // For now, it's just a placeholder function
+    if (!isListening) startListening(fieldName);
+    else stopListening();
+  };
+
+  const [isListening, setIsListening] = useState(false);
+
+  const startListening = async (field) => {
+    try {
+      setIsListening(true);
+
+      Voice.onSpeechResults = (event) => {
+        const text = event.value[0];
+
+        // Fill the text into the correct field
+        if (field === 'reason') setReason(text);
+        if (field === 'symptoms') setSymptoms(text);
+        if (field === 'curMeds') setCurMeds(text);
+      };
+
+      await Voice.start('en-US');
+    } catch (error) {
+      console.error('Speech error:', error);
+    }
+  };
+
+  const stopListening = async () => {
+    setIsListening(false);
+    await Voice.stop();
   };
 
   const mapToEnglish = (category, value) => {

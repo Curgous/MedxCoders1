@@ -20,21 +20,50 @@ export default function Pharmacy() {
     const [pharmacies, setPharmacies] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Get user location on mount
     useEffect(() => {
-        (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                Alert.alert('Permission Denied', 'Location access is required to find nearest pharmacies.');
-                return;
-            }
-            let location = await Location.getCurrentPositionAsync({});
-            setUserLocation({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-            });
-        })();
+        requestLocationPermission();
     }, []);
+
+    const requestLocationPermission = async () => {
+        let { status, canAskAgain } = await Location.requestForegroundPermissionsAsync();
+
+        if (status !== 'granted') {
+
+            Alert.alert(
+                "Permission Required",
+                "Location access is needed to find nearby pharmacies.",
+                [
+                    {
+                        text: "Retry",
+                        onPress: () => {
+                            if (canAskAgain) {
+                                requestLocationPermission();
+                            } else {
+                                Linking.openSettings(); // User manually enables it
+                            }
+                        }
+                    },
+                    {
+                        text: canAskAgain ? "Cancel" : "Open Settings",
+                        onPress: () => {
+                            if (!canAskAgain) Linking.openSettings();
+                        },
+                        style: "cancel",
+                    }
+                ]
+            );
+
+            return;
+        }
+
+        // Permission granted
+        let location = await Location.getCurrentPositionAsync({});
+        setUserLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+        });
+    };
+
 
     // Add demand to med_demand table
     const addMedicineDemand = async (medicineName) => {

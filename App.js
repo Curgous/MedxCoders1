@@ -14,6 +14,9 @@ import EmergencyCareVideos from './emergencycare';
 import Signup from './signup';
 import consultform from './consultform';
 import pharmacy from './pharmacy';
+import Counsche from './counsche';
+import Vidcon from './vidcon';
+
 import symptomChecker from './symptomchecker';
 import DoctorDashboard from './DoctorDashboard';
 import Cho from './cho';
@@ -134,6 +137,9 @@ export default function App() {
     <LanguageProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Counsche" component={Counsche} />
+          <Stack.Screen name="Vidcon" component={Vidcon} />
+
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Patient" component={Patient} />
           <Stack.Screen name="Doctor" component={Doctor} />

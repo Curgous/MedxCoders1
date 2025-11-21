@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
+
 export default function DoctorDashboard({ navigation, route }) {
   const { user } = route.params || {};
+
 
   return (
     <View style={styles.container}>
@@ -14,17 +16,34 @@ export default function DoctorDashboard({ navigation, route }) {
 
       {/* Vertical actions */}
       <View style={styles.buttonGroup}>
-        <TouchableOpacity style={styles.actionButton} onPress={() => { /* navigation logic */ }}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => {
+            // Navigate to counsche.js screen, passing necessary params
+            navigation.navigate('Counsche', {
+              dr_name: user?.name,
+              dr_id: user?.doc_id,
+            });
+          }}
+        >
           <Image source={require('./assets/cal.png')} style={styles.icon} />
           <Text style={styles.actionText}>Counselling Schedules</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("ReportGen", { user })}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate("ReportGen", { user })}
+        >
           <Image source={require('./assets/report.png')} style={styles.icon} />
           <Text style={styles.actionText}>Reports & Transactions</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton} onPress={() => { /* navigation logic */ }}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => {
+            // Your verify symptoms navigation logic here
+          }}
+        >
           <Image source={require('./assets/verify.png')} style={[styles.icon, styles.iconLarge]} />
           <Text style={styles.actionText}>Verify Symptoms</Text>
         </TouchableOpacity>
@@ -32,6 +51,7 @@ export default function DoctorDashboard({ navigation, route }) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -43,7 +63,7 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#3a4d5c',
+    color: '#3a4c5c',
     marginTop: 28,
     marginBottom: 18,
     alignSelf: 'flex-start',
