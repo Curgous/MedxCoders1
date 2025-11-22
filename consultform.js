@@ -184,12 +184,12 @@ export default function ConsultForm({ navigation, route }) {
   // Patient info
   const { patient } = route.params || {};
   console.log(patient);
-  const patient_id = patient?.id;
+  const patient_id = patient?.patient_no;
   const patient_name = patient?.name;
   const phone_number = patient?.phone_no;
   const age = patient?.age;
   const gender = patient?.gender;
-
+  console.log({patient_id, patient_name, phone_number, age, gender});
   const [reason, setReason] = useState('');
   const [symptomCat, setSymptomCat] = useState('');
   const [categoryType, setCategoryType] = useState('');

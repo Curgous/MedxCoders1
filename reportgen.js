@@ -14,7 +14,7 @@ import { supabase } from "./supabaseClient";
 export default function ReportGen({ route }) {
   const { user } = route.params || {};
   const doctorName = user?.name || "";
-
+  console.log({ user });
   // Form states
   const [patientId, setPatientId] = useState("");
   const [subject, setSubject] = useState("");               // New state for Report Subject

@@ -27,6 +27,7 @@ import Counsche from './counsche';
 import Vidcon from './vidcon';
 import HealthAwareness from './healthawareness';
 import DocSignup from './docSignup';
+import DocConsultView from './docConsultView';
 // Import LanguageProvider and LanguageContext
 import { LanguageProvider, LanguageContext } from './LanguageContext';
 
@@ -174,6 +175,7 @@ export default function App() {
           <Stack.Screen name="Vidcon" component={Vidcon} />
           <Stack.Screen name="HealthAwareness" component={HealthAwareness} />
           <Stack.Screen name="DocSignup" component={DocSignup} />
+          <Stack.Screen name="DocConsultView" component={DocConsultView} options={{ headerShown: false, title: 'Consults' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </LanguageProvider>

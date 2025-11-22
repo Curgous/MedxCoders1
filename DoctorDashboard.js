@@ -41,7 +41,7 @@ export default function DoctorDashboard({ navigation, route }) {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => {
-            // Your verify symptoms navigation logic here
+            navigation.navigate('DocConsultView', { user });
           }}
         >
           <Image source={require('./assets/verify.png')} style={[styles.icon, styles.iconLarge]} />
