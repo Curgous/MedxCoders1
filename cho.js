@@ -3,14 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 export default function DoctorDashboard({ navigation, route }) {
   const { user } = route.params || {};
-
+  console.log({ user });
   return (
     <View style={styles.container}>
       {/* Header */}
       <Text style={styles.logo}>MediConnect</Text>
 
       {/* Subtitle */}
-      <Text style={styles.dashboardTitle}>Doctor / CHO dashboard</Text>
+      <Text style={styles.dashboardTitle}>CHO dashboard</Text>
 
       {/* Vertical actions */}
       <View style={styles.buttonGroup}>
@@ -19,7 +19,7 @@ export default function DoctorDashboard({ navigation, route }) {
           <Text style={styles.actionText}>Counselling Schedules</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton} 
+        <TouchableOpacity style={styles.actionButton}
           onPress={() => navigation.navigate("ReportGen", { user })}>
           <Image source={require('./assets/report.png')} style={styles.icon} />
           <Text style={styles.actionText}>Reports & Transactions</Text>

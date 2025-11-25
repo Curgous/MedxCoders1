@@ -12,6 +12,10 @@ import Patient from './patient';
 import Doctor from './doctor';
 import EmergencyCareVideos from './emergencycare';
 import Signup from './signup';
+import DocSignup from './docSignup';
+import DocConsultView from './docConsultView';
+import ChoSignup from './ChoSignup';
+
 import consultform from './consultform';
 import pharmacy from './pharmacy';
 import Counsche from './counsche';
@@ -137,9 +141,6 @@ export default function App() {
     <LanguageProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Counsche" component={Counsche} />
-          <Stack.Screen name="Vidcon" component={Vidcon} />
-
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Patient" component={Patient} />
           <Stack.Screen name="Doctor" component={Doctor} />
@@ -152,41 +153,53 @@ export default function App() {
           <Stack.Screen name="symptomChecker" component={symptomChecker} />
           <Stack.Screen name="Cho" component={Cho} />
           <Stack.Screen name="DoctorDashboard" component={DoctorDashboard} />
-          <Stack.Screen name="HealthAwareness" component={HealthAwareness} />
-          <Stack.Screen
-            name="PatientReports"
-            component={PatientReports}
-            options={{ headerShown: false, title: 'Patient Reports' }}
-          />
+          <Stack.Screen name="PatientReports" component={PatientReports} options={{ headerShown: false, title: 'Patient Reports' }} />
 
           <Stack.Screen
             name="EmergencyCareVideos"
             component={EmergencyCareVideos}
             options={{ title: 'Emergency Care Videos' }}
           />
+
           <Stack.Screen
             name="PharmacistSignup"
             component={PharmacistSignup}
             options={{ title: 'Pharmacist Signup' }}
           />
+
           <Stack.Screen
             name="PharmacistPortal"
             component={PharmacistPortal}
             options={{ title: "Pharmacist Portal" }}
           />
+
           <Stack.Screen
             name="AddRemMedicine"
             component={AddRemMedicine}
             options={{ title: "Add/Remove Medicine" }}
           />
+
           <Stack.Screen
             name="CheckDemand"
             component={CheckDemand}
-            options={{ title: "Current Medicine Demands" }} // optional
+            options={{ title: "Current Medicine Demands" }}
           />
-          <Stack.Screen name="ReportGen" component={ReportGen} />
 
+          <Stack.Screen name="ReportGen" component={ReportGen} />
+          <Stack.Screen name="Counsche" component={Counsche} />
+          <Stack.Screen name="Vidcon" component={Vidcon} />
+          <Stack.Screen name="HealthAwareness" component={HealthAwareness} />
+          <Stack.Screen name="DocSignup" component={DocSignup} />
+
+          <Stack.Screen
+            name="DocConsultView"
+            component={DocConsultView}
+            options={{ headerShown: false, title: 'Consults' }}
+          />
+
+          <Stack.Screen name="ChoSignup" component={ChoSignup} />
         </Stack.Navigator>
+
       </NavigationContainer>
     </LanguageProvider>
   );

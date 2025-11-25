@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,6 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { LanguageContext } from './LanguageContext';
 import { supabase } from './supabaseClient';
 import Voice from '@react-native-voice/voice';
-
 
 const formTranslations = {
   en: {
@@ -185,13 +184,13 @@ export default function ConsultForm({ navigation, route }) {
 
   // Patient info
   const { patient } = route.params || {};
-  console.log(patient);
   const patient_id = patient?.id;
   const patient_name = patient?.name;
   const phone_number = patient?.phone_no;
   const age = patient?.age;
   const gender = patient?.gender;
 
+  // form state
   const [reason, setReason] = useState('');
   const [symptomCat, setSymptomCat] = useState('');
   const [categoryType, setCategoryType] = useState('');
@@ -213,38 +212,70 @@ export default function ConsultForm({ navigation, route }) {
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
+  // voice state
+  const [isListening, setIsListening] = useState(false);
+  const [currentField, setCurrentField] = useState(null);
+
+  // attach voice listeners once
+  useEffect(() => {
+    // results
+    Voice.onSpeechResults = (event) => {
+      const text = event?.value?.[0] || '';
+      if (!text) return;
+
+      if (currentField === 'reason') setReason(text);
+      if (currentField === 'symptoms') setSymptoms(text);
+      if (currentField === 'curMeds') setCurMeds(text);
+    };
+
+    // error handler
+    Voice.onSpeechError = (err) => {
+      console.warn('Voice error:', err);
+      // stop listening state if an error occurs
+      setIsListening(false);
+    };
+
+    // cleanup on unmount
+    return () => {
+      Voice.destroy()
+        .then(() => Voice.removeAllListeners && Voice.removeAllListeners())
+        .catch(() => {
+          /* ignore cleanup errors */
+        });
+    };
+    // currentField intentionally excluded so results handler doesn't get re-bound each time field changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleHistoryToggle = (field) => {
     setHealthHistory((prev) => ({ ...prev, [field]: !prev[field] }));
   };
-  const handleVoiceInput = (fieldName) => {
-    if (!isListening) startListening(fieldName);
-    else stopListening();
-  };
-
-  const [isListening, setIsListening] = useState(false);
 
   const startListening = async (field) => {
     try {
+      setCurrentField(field);
       setIsListening(true);
-
-      Voice.onSpeechResults = (event) => {
-        const text = event.value[0];
-
-        // Fill the text into the correct field
-        if (field === 'reason') setReason(text);
-        if (field === 'symptoms') setSymptoms(text);
-        if (field === 'curMeds') setCurMeds(text);
-      };
-
       await Voice.start('en-US');
     } catch (error) {
-      console.error('Speech error:', error);
+      console.error('Voice start error:', error);
+      setIsListening(false);
     }
   };
 
   const stopListening = async () => {
-    setIsListening(false);
-    await Voice.stop();
+    try {
+      await Voice.stop();
+    } catch (error) {
+      console.warn('Voice stop error:', error);
+    } finally {
+      setIsListening(false);
+      setCurrentField(null);
+    }
+  };
+
+  const handleVoiceInput = (fieldName) => {
+    if (!isListening) startListening(fieldName);
+    else stopListening();
   };
 
   const mapToEnglish = (category, value) => {
