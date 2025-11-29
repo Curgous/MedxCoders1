@@ -26,10 +26,9 @@ GoogleSignin.configure({
 const currentUser = GoogleSignin.getCurrentUser();
 console.log('Current Google user:', currentUser);
 
-export default function Counsche({ route }) {
-  const { dr_name, dr_id,asha_id } = route.params || {};
-  console.log(dr_id);
-  console.log(asha_id);
+export default function ChoCounsche({ route }) {
+  const { user } = route.params || {};
+  console.log({user});
   console.log("Client ID length:", GOOGLE_WEB_CLIENT_ID);
   const [section, setSection] = useState("create"); // "create" or "schedules"
 
@@ -60,7 +59,7 @@ export default function Counsche({ route }) {
       let { data: meetingsData, error: meetingsError } = await supabase
         .from("coun_sche")
         .select("*")
-        .eq("dr_id", dr_id)
+        .eq("dr_id", user?.cho_id)
         .order("date", { ascending: true });
 
       if (meetingsError) {
@@ -195,7 +194,7 @@ export default function Counsche({ route }) {
 
       const event = {
         summary: `Medical Consultation - Patient ${patientId}`,
-        description: `Patient ID: ${patientId}\nDoctor: ${dr_name}\nMedical Consultation Appointment`,
+        description: `Patient ID: ${patientId}\nDoctor: ${user?.cho_name}\nMedical Consultation Appointment`,
         start: {
           dateTime: meetingDateTime.toISOString(),
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -270,9 +269,10 @@ export default function Counsche({ route }) {
       vid_link: videoLink.trim(),
       date: dateStr,
       time: timeStr,
-      dr_name: dr_name || "",
-      dr_id: dr_id || "",
-      asha_id: asha_id || "",
+      dr_name: user?.cho_name || "",
+      dr_id: user?.cho_id || "",
+      she_type:"CHO",
+      asha_id: user?.asha_id || "",
     };
 
     let { error } = await supabase.from("coun_sche").insert([newMeeting]);

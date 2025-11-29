@@ -39,6 +39,9 @@ import AshaLit from './ashaLit';
 import AshaCon from './ashaCon';
 import HealthLit from './healthLit';
 import DocChoEmer from './docchoemer';
+import DocEmer from './docemer';
+import ChoCounsche from './chocounsche';
+import ChoConsultView from './choConsultView';
 
 // Import LanguageProvider and LanguageContext
 import { LanguageProvider, LanguageContext } from './LanguageContext';
@@ -214,6 +217,9 @@ export default function App() {
           <Stack.Screen name="HealthLit" component={HealthLit} />
           <Stack.Screen name="ViewLit" component={ViewLit} />
           <Stack.Screen name="DocChoEmer" component={DocChoEmer} />
+          <Stack.Screen name="DocEmer" component={DocEmer} />
+          <Stack.Screen name="ChoCounsche" component={ChoCounsche} />
+          <Stack.Screen name="ChoConsultView" component={ChoConsultView} />
         </Stack.Navigator>
 
       </NavigationContainer>

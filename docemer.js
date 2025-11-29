@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { supabase } from './supabaseClient';
 
-export default function DocChoEmer({ navigation,route }) {
+export default function DocEmer({ navigation,route }) {
   const [activeTab, setActiveTab] = useState('liveAlerts');
   const [liveAlerts, setLiveAlerts] = useState([]);
   const [acceptedAlerts, setAcceptedAlerts] = useState([]);
@@ -65,9 +65,9 @@ export default function DocChoEmer({ navigation,route }) {
         .from('p_emergency')
         .update({ 
           p_status: 'assigned',
-          assigned_prof: 'CHO',
-          assigned_profid: user.cho_id,
-          assigned_profnm: user.cho_name,
+          assigned_prof: 'Doctor',
+          assigned_profid: user.doc_id,
+          assigned_profnm: user.name,
           assigned_profphone: user.phone_no
         })
         .eq('emer_id', emerId);

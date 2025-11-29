@@ -13,6 +13,7 @@ import { supabase } from "./supabaseClient";
 
 export default function ReportGen({ route }) {
   const { user } = route.params || {};
+  console.log({ user });
   const doctorName = user?.name || "";
 
   // Form states

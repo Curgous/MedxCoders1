@@ -167,6 +167,7 @@ export default function PatientDashboard({ navigation, route }) {
   const [isCheckingEmergency, setIsCheckingEmergency] = useState(true);
   const t = translations[language];
   const { patient } = route.params || {};
+  console.log({ patient });
 
   // patientId lookup: prefer patient_no then id
   const patientId = patient?.patient_no || patient?.id || '';
@@ -383,6 +384,7 @@ export default function PatientDashboard({ navigation, route }) {
           p_name: patientName,
           p_loc: locationJson,
           p_symptoms: symptoms || null,
+          p_phone: patient?.phone_no || null,
         }])
         .select();
 

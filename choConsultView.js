@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
     View,
@@ -11,14 +10,14 @@ import {
 } from 'react-native';
 import { supabase } from './supabaseClient';
 
-export default function DocConsultView({ navigation, route }) {
+export default function ChoConsultView({ navigation, route }) {
     const { user } = route.params || {};
     const [activeTab, setActiveTab] = useState('inbox');
     const [inboxConsults, setInboxConsults] = useState([]);
     const [acceptedConsults, setAcceptedConsults] = useState([]);
     const [expandedIds, setExpandedIds] = useState(new Set());
     const [refreshing, setRefreshing] = useState(false);
-
+    console.log({ user });
     useEffect(() => {
         fetchConsultations();
     }, []);
@@ -30,7 +29,7 @@ export default function DocConsultView({ navigation, route }) {
                 .from('consultation_records')
                 .select('*')
                 .eq('acc_stat', 'Pending')
-                .eq('asha_pref', 'Doctor')
+                .eq('asha_pref', 'CHO')
                 .order('created_at', { ascending: false });
 
             if (pendingError) throw pendingError;
@@ -39,12 +38,12 @@ export default function DocConsultView({ navigation, route }) {
             // Fetch accepted consultations FOR THIS DOCTOR ONLY (by acc_id)
             let acceptedData = [];
             let acceptedError = null;
-            if (user?.doc_id) {
+            if (user?.cho_id) {
                 const res = await supabase
                     .from('consultation_records')
                     .select('*')
                     .eq('acc_stat', 'accepted')
-                    .eq('acc_id', user.doc_id)
+                    .eq('acc_id', user.cho_id)
                     .order('created_at', { ascending: false });
                 acceptedData = res.data;
                 acceptedError = res.error;
@@ -79,7 +78,7 @@ export default function DocConsultView({ navigation, route }) {
         try {
             const { error } = await supabase
                 .from('consultation_records')
-                .update({ acc_stat: 'accepted', acc_id: user?.doc_id })
+                .update({ acc_stat: 'accepted', acc_id: user?.cho_id })
                 .eq('id', consultId);
 
             if (error) throw error;
@@ -259,11 +258,12 @@ export default function DocConsultView({ navigation, route }) {
                         <TouchableOpacity
                             style={styles.scheduleButton}
                             onPress={() =>
-                                navigation.navigate('Counsche', {
-                                    dr_name: user?.name, 
-                                    dr_id: user?.doc_id,
-                                    asha_id: consult.asha_id // Pass ASHA ID to Counsche
-                                })
+                                navigation.navigate('ChoCounsche', {
+            user: {
+                ...user, // Keep all existing user data
+                asha_id: consult.asha_id // Add ASHA ID
+            }
+        })
                             }
                         >
                             <Text style={styles.actionButtonText}>Schedule Consultation</Text>

@@ -12,10 +12,8 @@ import { Picker } from '@react-native-picker/picker';
 import { supabase } from './supabaseClient';
 
 const SPECIALIZATION_OPTIONS = [
-    "Basic health-check up provider",
-    "Health Education Provider",
+    "CHO",
     "ANM/ASHA Worker",
-    "Patient referral and Co-ordinator"
 ];
 
 function getNextChoId(currentId) {

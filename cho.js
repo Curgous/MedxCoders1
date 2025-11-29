@@ -25,9 +25,13 @@ export default function Cho({ navigation, route }) {
           <Text style={styles.actionText}>Emergency Status</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton} onPress={() => { /* navigation logic */ }}>
+        <TouchableOpacity style={styles.actionButton} onPress={() =>navigation.navigate("ChoConsultView", { user })}>
           <Image source={require('./assets/verify.png')} style={[styles.icon, styles.iconLarge]} />
           <Text style={styles.actionText}>Verify Symptoms</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("ChoCounsche", { user })}>
+          <Image source={require('./assets/cal.png')} style={styles.icon} />
+          <Text style={styles.actionText}>Counselling Schedules</Text>
         </TouchableOpacity>
       </View>
     </View>

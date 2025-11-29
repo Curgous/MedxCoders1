@@ -41,7 +41,7 @@ export default function AshaEmer({ navigation,route }) {
       const { data: acceptedData, error: acceptedError } = await supabase
         .from('p_emergency')
         .select('*')
-        .eq('p_status', 'accepted')
+        .in('p_status', ['accepted', 'assigning', 'assigned'])
         .order('p_time', { ascending: false });
 
       if (acceptedError) throw acceptedError;
@@ -64,7 +64,7 @@ export default function AshaEmer({ navigation,route }) {
       const { error } = await supabase
         .from('p_emergency')
         .update({ p_status: 'accepted',assigned_ashaid: user.cho_id,
-        assigned_ashanm: user.cho_name, })
+        assigned_ashanm: user.cho_name,assigned_ashaphone: user.phone_no })
         .eq('emer_id', emerId);
 
       if (error) throw error;
@@ -87,6 +87,38 @@ export default function AshaEmer({ navigation,route }) {
       await fetchAlerts();
     } catch (err) {
       Alert.alert('Error', 'Error updating status');
+    }
+  };
+
+  const handleCallPatient = (phoneNumber) => {
+    if (!phoneNumber) {
+      Alert.alert('Error', 'No phone number available for this patient');
+      return;
+    }
+
+    try {
+      const url = `tel:${phoneNumber}`;
+      Linking.openURL(url).catch(() => {
+        Alert.alert('Error', 'Could not make phone call');
+      });
+    } catch (err) {
+      Alert.alert('Error', 'Error making phone call');
+    }
+  };
+
+  const handleCallDoctorCho = (phoneNumber) => {
+    if (!phoneNumber) {
+      Alert.alert('Error', 'No phone number available for Doctor/CHO');
+      return;
+    }
+
+    try {
+      const url = `tel:${phoneNumber}`;
+      Linking.openURL(url).catch(() => {
+        Alert.alert('Error', 'Could not make phone call');
+      });
+    } catch (err) {
+      Alert.alert('Error', 'Error making phone call');
     }
   };
 
@@ -142,12 +174,45 @@ export default function AshaEmer({ navigation,route }) {
             <Text style={styles.acceptButtonText}>Accept</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity
-            style={styles.notifyButton}
-            onPress={() => handleNotifyDoctorCho(alert.emer_id)}
-          >
-            <Text style={styles.notifyButtonText}>Notify Doctor/CHO</Text>
-          </TouchableOpacity>
+          <>
+            {/* Call Patient Button */}
+            <TouchableOpacity
+              style={[
+                styles.callPatientButton,
+                !alert.p_phone && styles.disabledButton
+              ]}
+              onPress={() => handleCallPatient(alert.p_phone)}
+              disabled={!alert.p_phone}
+            >
+              <Text style={styles.buttonText}>
+                {alert.p_phone ? 'Call Patient' : 'No Patient Phone'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Notify Doctor/CHO Button */}
+            <TouchableOpacity
+              style={styles.notifyButton}
+              onPress={() => handleNotifyDoctorCho(alert.emer_id)}
+            >
+              <Text style={styles.buttonText}>Notify Doctor/CHO</Text>
+            </TouchableOpacity>
+
+            {/* Call Doctor/CHO Button - Only show when p_status is "assigned" */}
+            {alert.p_status === 'assigned' && (
+              <TouchableOpacity
+                style={[
+                  styles.callDoctorButton,
+                  !alert.assigned_profphone && styles.disabledButton
+                ]}
+                onPress={() => handleCallDoctorCho(alert.assigned_profphone)}
+                disabled={!alert.assigned_profphone}
+              >
+                <Text style={styles.buttonText}>
+                  {alert.assigned_profphone ? 'Call Doctor/CHO' : 'No Doctor/CHO Phone'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </View>
     </View>
@@ -344,16 +409,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  callPatientButton: {
+    backgroundColor: '#2ecc71',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   notifyButton: {
     backgroundColor: '#3498db',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
+    marginBottom: 8,
   },
-  notifyButtonText: {
+  callDoctorButton: {
+    backgroundColor: '#9b59b6',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  disabledButton: {
+    backgroundColor: '#95a5a6',
   },
   emptyText: {
     textAlign: 'center',

@@ -144,7 +144,7 @@ export default function AshaCon({ navigation, route }) {
           </View>
           <View style={styles.rightHeader}>
             <Text style={styles.counsellingBoxTitle}>{schedule.dr_name}</Text>
-            <Text style={styles.boxSubLabel}>Doctor Name</Text>
+            <Text style={styles.boxSubLabel}>Professional Name</Text>
           </View>
         </View>
 
